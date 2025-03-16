@@ -34,5 +34,5 @@ public class Role {
     private String title;
 
     @ManyToMany(mappedBy = "roleSet", fetch = FetchType.LAZY)
-    private Set<User> userSet = new HashSet<>();
+    private Set<User> userSet;
 }

@@ -13,6 +13,7 @@ import jakarta.persistence.JoinTable;
 import jakarta.persistence.JoinColumn;
 import jakarta.persistence.PrePersist;
 
+import jakarta.validation.constraints.NotNull;
 import lombok.Builder;
 import lombok.Getter;
 import lombok.Setter;
@@ -52,7 +53,7 @@ public class User {
     @Column(name = "creation_date", nullable = false)
     private LocalDateTime creationDate;
     @Column(name = "is_active", nullable = false)
-    private Boolean isActive = true;
+    private Boolean isActive;
 
     @ManyToMany(fetch = FetchType.EAGER, cascade = {CascadeType.PERSIST, CascadeType.MERGE})
     @JoinTable(
@@ -60,11 +61,17 @@ public class User {
             joinColumns = @JoinColumn(name = "user_id"),
             inverseJoinColumns = @JoinColumn(name = "role_id")
     )
-    private Set<Role> roleSet = new HashSet<>();
+    private Set<Role> roleSet;
 
     @PrePersist
     private void prePersist() {
-        creationDate = LocalDateTime.now();
-        isActive = true;
+        if (creationDate == null)
+            creationDate = LocalDateTime.now();
+
+        if (isActive == null)
+            isActive = true;
+
+        if (roleSet == null)
+            roleSet = new HashSet<>();
     }
 }

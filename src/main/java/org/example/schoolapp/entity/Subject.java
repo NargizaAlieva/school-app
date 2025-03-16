@@ -26,15 +26,15 @@ public class Subject {
     @Column(name = "is_active")
     private Boolean isActive;
 
-    @ManyToMany(fetch = FetchType.LAZY)
-    @JoinTable(name = "m2m_subjects_teachers",
-            joinColumns = @JoinColumn(name = "subject_id", referencedColumnName = "id"),
-            inverseJoinColumns = @JoinColumn(name = "teacher_id", referencedColumnName = "id"))
-    private Set<Employee> teachersSet = new HashSet<>();
+    @ManyToMany(fetch = FetchType.LAZY, mappedBy = "subjectSet")
+    private Set<Employee> teachersSet;
 
     @PrePersist
     private void prePersist() {
         if (isActive == null)
             isActive = true;
+
+        if (teachersSet == null)
+            teachersSet = new HashSet<>();
     }
 }
