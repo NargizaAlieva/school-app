@@ -31,10 +31,13 @@ public class Lesson {
     private Schedule schedule;
 
     @OneToMany(mappedBy = "lessonMark")
-    private List<Mark> markList = new ArrayList<>();
+    private List<Mark> markList;
 
     @PrePersist
     private void prePersist() {
-        creationDate = LocalDateTime.now();
+        if (creationDate == null)
+            creationDate = LocalDateTime.now();
+        if (markList == null)
+            markList = new ArrayList<>();
     }
 }
