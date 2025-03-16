@@ -4,6 +4,8 @@ import jakarta.persistence.*;
 import lombok.*;
 import org.example.schoolapp.enums.DaysOfWeek;
 
+import java.util.List;
+
 @Entity
 @Table(name = "schedules")
 @Builder(toBuilder = true)
@@ -26,9 +28,9 @@ public class Schedule {
     @Column(name = "school_year", nullable = false)
     private String schoolYear;
     @Column(name = "is_approve")
-    private Boolean isApprove = false;
+    private Boolean isApprove;
     @Column(name = "is_active", nullable = false)
-    private Boolean isActive = true;
+    private Boolean isActive;
 
     @ManyToOne
     @JoinColumn(name = "subject_id", referencedColumnName = "id")
@@ -41,4 +43,15 @@ public class Schedule {
     @ManyToOne
     @JoinColumn(name = "grade_id", referencedColumnName = "id")
     private Grade gradeSchedule;
+
+    @OneToMany(mappedBy = "schedule")
+    private List<Lesson> lessonSchedule;
+
+    @PrePersist
+    public void prePersist() {
+        if (isActive == null)
+            isActive = false;
+        if (isApprove == null)
+            isApprove = false;
+    }
 }

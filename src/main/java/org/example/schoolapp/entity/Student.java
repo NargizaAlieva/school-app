@@ -4,6 +4,7 @@ import jakarta.persistence.*;
 import lombok.*;
 import org.example.schoolapp.enums.ParentStatus;
 
+import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 
@@ -40,4 +41,10 @@ public class Student {
     @ManyToOne
     @JoinColumn(name = "grade_id", referencedColumnName = "id")
     private Grade grade;
+
+    @PrePersist
+    public void prePersist() {
+        if (markList == null)
+            markList = new ArrayList<>();
+    }
 }
