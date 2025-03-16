@@ -1,6 +1,5 @@
 package org.example.schoolapp.controller;
 
-import org.example.schoolapp.dto.Response;
 import org.example.schoolapp.dto.request.GradeDtoRequest;
 import org.example.schoolapp.dto.response.GradeDto;
 import org.example.schoolapp.service.GradeService;
@@ -9,13 +8,11 @@ import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
-import org.mockito.Mockito;
 import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.http.MediaType;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.setup.MockMvcBuilders;
 
-import java.util.Collections;
 import java.util.List;
 
 import static org.mockito.ArgumentMatchers.any;
