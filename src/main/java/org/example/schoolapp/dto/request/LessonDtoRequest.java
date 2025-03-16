@@ -1,4 +1,4 @@
-package org.example.schoolapp.dto.response;
+package org.example.schoolapp.dto.request;
 
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -11,10 +11,10 @@ import java.time.LocalDateTime;
 @Builder(toBuilder = true)
 @AllArgsConstructor
 @NoArgsConstructor
-public class LessonDto {
+public class LessonDtoRequest {
     private Long id;
     private String topic;
     private String homework;
     private LocalDateTime creationDate;
-    private ScheduleDto schedule;
+    private Long scheduleId;
 }

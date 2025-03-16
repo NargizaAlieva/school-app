@@ -1,6 +1,5 @@
 package org.example.schoolapp.repository;
 
-import org.example.schoolapp.dto.response.LessonDto;
 import org.example.schoolapp.entity.Lesson;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
