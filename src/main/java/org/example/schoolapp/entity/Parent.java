@@ -23,5 +23,11 @@ public class Parent {
     private User user;
 
     @OneToMany(mappedBy = "parent", fetch = FetchType.LAZY)
-    private List<Student> childrenList = new ArrayList<>();
+    private List<Student> childrenList;
+
+    @PrePersist
+    public void prePersist() {
+        if (childrenList == null)
+            childrenList = new ArrayList<>();
+    }
 }

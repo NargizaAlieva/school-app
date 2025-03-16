@@ -3,6 +3,7 @@ package org.example.schoolapp.entity;
 import jakarta.persistence.*;
 import lombok.*;
 
+import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
@@ -34,6 +35,9 @@ public class Employee {
     @OneToMany(fetch = FetchType.LAZY, mappedBy = "teacherSchedule")
     private List<Schedule> scheduleList;
 
-    @ManyToMany(fetch = FetchType.LAZY, mappedBy = "teachersSet")
-    private Set<Subject> subjectSet = new HashSet<>();
+    @ManyToMany(fetch = FetchType.LAZY)
+    @JoinTable(name = "m2m_subjects_teachers",
+            joinColumns = @JoinColumn(name = "teacher_id", referencedColumnName = "id"),
+            inverseJoinColumns = @JoinColumn(name = "subject_id", referencedColumnName = "id"))
+    private Set<Subject> subjectSet;
 }
