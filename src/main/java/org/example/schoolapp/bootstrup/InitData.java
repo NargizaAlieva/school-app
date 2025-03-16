@@ -3,14 +3,10 @@ package org.example.schoolapp.bootstrup;
 import jakarta.annotation.PostConstruct;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.example.schoolapp.dto.request.EmployeeDroRequest;
 import org.example.schoolapp.entity.*;
 import org.example.schoolapp.enums.DaysOfWeek;
 import org.example.schoolapp.enums.ParentStatus;
-import org.example.schoolapp.repository.*;
 import org.example.schoolapp.service.*;
-import org.example.schoolapp.util.mapper.EmployeeMapper;
-import org.example.schoolapp.util.mapper.UserMapper;
 import org.springframework.stereotype.Component;
 
 import java.util.*;
