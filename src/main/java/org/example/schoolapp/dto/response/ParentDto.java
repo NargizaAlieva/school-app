@@ -1,5 +1,6 @@
 package org.example.schoolapp.dto.response;
 
+import jakarta.validation.constraints.NotNull;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
@@ -12,7 +13,11 @@ import java.util.List;
 @AllArgsConstructor
 @NoArgsConstructor
 public class ParentDto {
+    @NotNull(message = "Id cannot be null")
     private Long id;
+
+    @NotNull(message = "UserDto cannot be null")
     private UserDto user;
+
     private List<String> childrenNameList;
 }
