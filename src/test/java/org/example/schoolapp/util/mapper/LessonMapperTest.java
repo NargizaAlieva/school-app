@@ -2,8 +2,8 @@ package org.example.schoolapp.util.mapper;
 
 import org.example.schoolapp.dto.request.LessonDtoRequest;
 import org.example.schoolapp.dto.response.LessonDto;
-import org.example.schoolapp.entity.Lesson;
-import org.example.schoolapp.entity.Schedule;
+import org.example.schoolapp.entity.*;
+import org.example.schoolapp.enums.DaysOfWeek;
 import org.example.schoolapp.service.ScheduleService;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -12,9 +12,9 @@ import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 
-import java.time.LocalDateTime;
 import java.util.Collections;
 import java.util.List;
+import java.util.Set;
 
 import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.Mockito.*;
@@ -36,22 +36,60 @@ class LessonMapperTest {
 
     @BeforeEach
     void setUp() {
-        schedule = new Schedule();
-        schedule.setId(1L);
+        Subject subject = Subject.builder()
+                .id(1L)
+                .title("Math")
+                .description("Algebra and Geometry")
+                .isActive(true)
+                .build();
 
-        lesson = new Lesson();
-        lesson.setId(1L);
-        lesson.setTopic("Math");
-        lesson.setHomework("Solve equations");
-        lesson.setCreationDate(LocalDateTime.of(2024, 3, 13, 10, 0));
-        lesson.setSchedule(schedule);
+        User user = User.builder()
+                .username("Sara Doe")
+                .firstName("Sara")
+                .lastName("Doe")
+                .middleName("M.")
+                .email("sara@gmail.com")
+                .build();
 
-        lessonDtoRequest = new LessonDtoRequest();
-        lessonDtoRequest.setId(1L);
-        lessonDtoRequest.setTopic("Math");
-        lessonDtoRequest.setHomework("Solve equations");
-        lessonDtoRequest.setCreationDate(LocalDateTime.of(2024, 3, 13, 10, 0));
-        lessonDtoRequest.setScheduleId(1L);
+        Employee teacher = Employee.builder()
+                .id(1L)
+                .user(user)
+                .build();
+
+        Grade grade = Grade.builder()
+                .id(1L)
+                .title("10A")
+                .classTeacher(teacher)
+                .studentSet(Set.of())
+                .isActive(true)
+                .build();
+
+        schedule = Schedule.builder()
+                .id(1L)
+                .dayOfWeek(DaysOfWeek.MONDAY)
+                .dueTime("10:30-11.15")
+                .quarter(1)
+                .schoolYear("2023-2024")
+                .subjectSchedule(subject)
+                .gradeSchedule(grade)
+                .teacherSchedule(teacher)
+                .isApprove(true)
+                .isActive(true)
+                .build();
+
+        lesson = Lesson.builder()
+                .id(1L)
+                .topic("Math")
+                .homework("Solve equations")
+                .schedule(schedule)
+                .build();
+
+        lessonDtoRequest = LessonDtoRequest.builder()
+                .id(1L)
+                .topic("Math")
+                .homework("Solve equations")
+                .scheduleId(1L)
+                .build();
     }
 
     @Test
@@ -72,10 +110,10 @@ class LessonMapperTest {
         List<Lesson> lessons = Collections.singletonList(lesson);
         when(scheduleMapper.toScheduleDto(schedule)).thenReturn(null);
 
-        List<LessonDto> lessonDtos = lessonMapper.toLessonDtoList(lessons);
+        List<LessonDto> lessonDto = lessonMapper.toLessonDtoList(lessons);
 
-        assertNotNull(lessonDtos);
-        assertEquals(1, lessonDtos.size());
+        assertNotNull(lessonDto);
+        assertEquals(1, lessonDto.size());
     }
 
     @Test

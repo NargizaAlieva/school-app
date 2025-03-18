@@ -34,34 +34,37 @@ class UserMapperTest {
 
     @BeforeEach
     void setUp() {
-        role = new Role();
-        role.setId(1L);
-        role.setTitle("ADMIN");
+        role = Role.builder()
+                .id(1L)
+                .title("ADMIN")
+                .build();
 
-        user = new User();
-        user.setId(1L);
-        user.setUsername("johndoe");
-        user.setFirstName("John");
-        user.setLastName("Doe");
-        user.setMiddleName("Michael");
-        user.setEmail("john@example.com");
-        user.setPhone("+1234567890");
-        user.setIsActive(true);
-        user.setCreationDate(LocalDateTime.now());
-        user.setRoleSet(Set.of(role));
+        user = User.builder()
+                .id(1L)
+                .username("john-doe")
+                .firstName("John")
+                .lastName("Doe")
+                .middleName("Michael")
+                .email("john@example.com")
+                .phone("+1234567890")
+                .isActive(true)
+                .creationDate(LocalDateTime.now())
+                .roleSet(Set.of(role))
+                .build();
 
-        userDtoRequest = new UserDtoRequest();
-        userDtoRequest.setId(1L);
-        userDtoRequest.setUsername("johndoe");
-        userDtoRequest.setFirstName("John");
-        userDtoRequest.setLastName("Doe");
-        userDtoRequest.setMiddleName("Michael");
-        userDtoRequest.setEmail("john@example.com");
-        userDtoRequest.setPhone("+1234567890");
-        userDtoRequest.setPassword("password123");
-        userDtoRequest.setIsActive(true);
-        userDtoRequest.setCreationDate(LocalDateTime.now());
-        userDtoRequest.setRoleSet(Set.of(1L));
+        userDtoRequest = UserDtoRequest.builder()
+                .id(1L)
+                .username("john-doe")
+                .firstName("John")
+                .lastName("Doe")
+                .middleName("Michael")
+                .email("john@example.com")
+                .phone("+1234567890")
+                .password("password123")
+                .isActive(true)
+                .creationDate(LocalDateTime.now())
+                .roleSet(Set.of(1L))
+                .build();
     }
 
     @Test

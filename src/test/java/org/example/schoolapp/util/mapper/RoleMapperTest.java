@@ -38,12 +38,12 @@ class RoleMapperTest {
         Role role1 = Role.builder().id(1L).title("Admin").build();
         Role role2 = Role.builder().id(2L).title("User").build();
 
-        List<RoleDto> roleDtos = roleMapper.toRoleDtoList(Arrays.asList(role1, role2));
+        List<RoleDto> roleDto = roleMapper.toRoleDtoList(Arrays.asList(role1, role2));
 
-        assertNotNull(roleDtos);
-        assertEquals(2, roleDtos.size());
-        assertEquals("Admin", roleDtos.get(0).getTitle());
-        assertEquals("User", roleDtos.get(1).getTitle());
+        assertNotNull(roleDto);
+        assertEquals(2, roleDto.size());
+        assertEquals("Admin", roleDto.get(0).getTitle());
+        assertEquals("User", roleDto.get(1).getTitle());
     }
 
     @Test

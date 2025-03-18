@@ -2,10 +2,7 @@ package org.example.schoolapp.util.mapper;
 
 import org.example.schoolapp.dto.request.StudentDtoRequest;
 import org.example.schoolapp.dto.response.StudentDto;
-import org.example.schoolapp.entity.Grade;
-import org.example.schoolapp.entity.Parent;
-import org.example.schoolapp.entity.Student;
-import org.example.schoolapp.entity.User;
+import org.example.schoolapp.entity.*;
 import org.example.schoolapp.enums.ParentStatus;
 import org.example.schoolapp.service.GradeService;
 import org.example.schoolapp.service.ParentService;
@@ -17,8 +14,8 @@ import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 
-import java.util.Date;
 import java.util.List;
+import java.util.Set;
 
 import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.Mockito.*;
@@ -46,31 +43,70 @@ class StudentMapperTest {
 
     @BeforeEach
     void setUp() {
-        User user = new User();
-        user.setId(1L);
+        User user = User.builder()
+                .id(1L)
+                .username("john")
+                .firstName("John")
+                .lastName("Doe")
+                .email("john.doe@example.com")
+                .build();
 
-        Grade grade = new Grade();
-        grade.setId(2L);
-        grade.setTitle("10th Grade");
+        Parent parent = Parent.builder()
+                .id(1L)
+                .user(user)
+                .build();
 
-        Parent parent = new Parent();
-        parent.setId(3L);
+        Subject subject = Subject.builder()
+                .id(1L)
+                .title("Math")
+                .description("Algebra and Geometry")
+                .build();
 
-        student = new Student();
-        student.setId(1L);
-        student.setBirthday(new Date());
-        student.setParentStatus(ParentStatus.FATHER);
-        student.setUser(user);
-        student.setGrade(grade);
-        student.setParent(parent);
+        User teacherUser = User.builder()
+                .id(1L)
+                .username("mara")
+                .firstName("Mara")
+                .lastName("Ave")
+                .email("mara.ave@example.com")
+                .build();
 
-        studentDtoRequest = new StudentDtoRequest();
-        studentDtoRequest.setId(1L);
-        studentDtoRequest.setBirthday(new Date());
-        studentDtoRequest.setParentStatus("father");
-        studentDtoRequest.setUserId(1L);
-        studentDtoRequest.setGradeId(2L);
-        studentDtoRequest.setParentId(3L);
+        Employee teacher = Employee.builder()
+                .id(10L)
+                .position("Teacher")
+                .salary(5000)
+                .user(teacherUser)
+                .subjectSet(Set.of(subject))
+                .build();
+
+        Grade grade = Grade.builder()
+                .id(1L)
+                .classTeacher(teacher)
+                .title("10B")
+                .build();
+
+        User studentUser = User.builder()
+                .id(1L)
+                .username("sara")
+                .firstName("Sara")
+                .lastName("Doe")
+                .email("sara.doe@example.com")
+                .build();
+
+        student = Student.builder()
+                .id(10L)
+                .parent(parent)
+                .user(studentUser)
+                .grade(grade)
+                .parentStatus(ParentStatus.FATHER)
+                .build();
+
+        studentDtoRequest = StudentDtoRequest.builder()
+                .id(1L)
+                .parentStatus("father")
+                .userId(1L)
+                .gradeId(1L)
+                .parentId(1L)
+                .build();
     }
 
     @Test
@@ -84,17 +120,17 @@ class StudentMapperTest {
 
     @Test
     void testToStudentDtoList() {
-        List<StudentDto> studentDtos = studentMapper.toStudentDtoList(List.of(student));
-        assertNotNull(studentDtos);
-        assertEquals(1, studentDtos.size());
-        assertEquals(student.getId(), studentDtos.get(0).getId());
+        List<StudentDto> studentDto = studentMapper.toStudentDtoList(List.of(student));
+        assertNotNull(studentDto);
+        assertEquals(1, studentDto.size());
+        assertEquals(student.getId(), studentDto.get(0).getId());
     }
 
     @Test
     void testToStudentEntity() {
         when(userService.getEntityById(1L)).thenReturn(student.getUser());
-        when(gradeService.getByIdEntity(2L)).thenReturn(student.getGrade());
-        when(parentService.getByIdEntity(3L)).thenReturn(student.getParent());
+        when(gradeService.getByIdEntity(1L)).thenReturn(student.getGrade());
+        when(parentService.getByIdEntity(1L)).thenReturn(student.getParent());
 
         Student result = studentMapper.toStudentEntity(studentDtoRequest);
 

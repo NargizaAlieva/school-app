@@ -31,7 +31,7 @@ class SubjectMapperTest {
                 .title("Math")
                 .description("Algebra and Geometry")
                 .isActive(true)
-                .teachersSet(Set.of(createMockEmployee("John", "Doe", "")))
+                .teachersSet(Set.of(createMockEmployee()))
                 .build();
 
         SubjectDto subjectDto = subjectMapper.toSubjectDto(subject);
@@ -66,11 +66,11 @@ class SubjectMapperTest {
         Subject subject1 = Subject.builder().id(1L).title("Math").description("Algebra").isActive(true).build();
         Subject subject2 = Subject.builder().id(2L).title("Biology").description("Genetics").isActive(false).build();
 
-        List<SubjectDto> subjectDtos = subjectMapper.toSubjectDtoList(List.of(subject1, subject2));
+        List<SubjectDto> subjectDto = subjectMapper.toSubjectDtoList(List.of(subject1, subject2));
 
-        assertEquals(2, subjectDtos.size());
-        assertEquals("Math", subjectDtos.get(0).getTitle());
-        assertEquals("Biology", subjectDtos.get(1).getTitle());
+        assertEquals(2, subjectDto.size());
+        assertEquals("Math", subjectDto.get(0).getTitle());
+        assertEquals("Biology", subjectDto.get(1).getTitle());
     }
 
     @Test
@@ -78,18 +78,19 @@ class SubjectMapperTest {
         Subject subject1 = Subject.builder().id(1L).title("Chemistry").description("Organic Chemistry").isActive(true).build();
         Subject subject2 = Subject.builder().id(2L).title("History").description("World History").isActive(false).build();
 
-        Set<SubjectDto> subjectDtos = subjectMapper.toSubjectDtoSet(Set.of(subject1, subject2));
+        Set<SubjectDto> subjectDto = subjectMapper.toSubjectDtoSet(Set.of(subject1, subject2));
 
-        assertEquals(2, subjectDtos.size());
-        assertTrue(subjectDtos.stream().anyMatch(dto -> dto.getTitle().equals("Chemistry")));
-        assertTrue(subjectDtos.stream().anyMatch(dto -> dto.getTitle().equals("History")));
+        assertEquals(2, subjectDto.size());
+        assertTrue(subjectDto.stream().anyMatch(dto -> dto.getTitle().equals("Chemistry")));
+        assertTrue(subjectDto.stream().anyMatch(dto -> dto.getTitle().equals("History")));
     }
 
-    private Employee createMockEmployee(String firstName, String lastName, String middleName) {
+    private Employee createMockEmployee() {
         User user = User.builder()
-                .firstName(firstName)
-                .lastName(lastName)
-                .middleName(middleName)
+                .username("John Doe")
+                .firstName("John")
+                .lastName("Doe")
+                .email("john@doe.com")
                 .build();
 
         return Employee.builder().user(user).build();

@@ -43,12 +43,4 @@ public class LessonMapper {
                 .schedule(scheduleService.getScheduleByIdEntity(lessonDtoRequest.getScheduleId()))
                 .build();
     }
-
-    private String teacherToString(Lesson lesson) {
-        String teacherFullName = lesson.getSchedule().getTeacherSchedule().getUser().getFirstName() + " " + lesson.getSchedule().getTeacherSchedule().getUser().getLastName();
-        if(lesson.getSchedule().getTeacherSchedule().getUser().getMiddleName() != null)
-            teacherFullName += " " + lesson.getSchedule().getTeacherSchedule().getUser().getMiddleName();
-
-        return teacherFullName;
-    }
 }

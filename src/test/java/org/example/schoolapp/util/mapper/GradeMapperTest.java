@@ -12,7 +12,6 @@ import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
 
-import java.time.LocalDateTime;
 import java.util.Set;
 
 import static org.junit.jupiter.api.Assertions.*;
@@ -29,34 +28,37 @@ class GradeMapperTest {
     private Grade grade;
     private GradeDtoRequest gradeDtoRequest;
     private Employee employee;
-    private User user;
 
     @BeforeEach
     void setUp() {
         MockitoAnnotations.openMocks(this);
 
-        user = new User();
-        user.setFirstName("John");
-        user.setLastName("Doe");
-        user.setMiddleName("M.");
+        User user = User.builder()
+                .username("Sara Doe")
+                .firstName("Sara")
+                .lastName("Doe")
+                .middleName("M.")
+                .email("sara@gmail.com")
+                .build();
 
-        employee = new Employee();
-        employee.setUser(user);
+        employee = Employee.builder()
+                .user(user)
+                .build();
 
-        grade = new Grade();
-        grade.setId(1L);
-        grade.setTitle("10A");
-        grade.setClassTeacher(employee);
-        grade.setStudentSet(Set.of());
-        grade.setCreationDate(LocalDateTime.now());
-        grade.setIsActive(true);
+        grade = Grade.builder()
+                .id(1L)
+                .title("10A")
+                .classTeacher(employee)
+                .studentSet(Set.of())
+                .isActive(true)
+                .build();
 
-        gradeDtoRequest = new GradeDtoRequest();
-        gradeDtoRequest.setId(1L);
-        gradeDtoRequest.setTitle("10A");
-        gradeDtoRequest.setClassTeacherId(1L);
-        gradeDtoRequest.setCreationDate(null);
-        gradeDtoRequest.setIsActive(true);
+        gradeDtoRequest = GradeDtoRequest.builder()
+                .id(1L)
+                .title("10A")
+                .classTeacherId(1L)
+                .isActive(true)
+                .build();
     }
 
     @Test
@@ -66,7 +68,7 @@ class GradeMapperTest {
         assertNotNull(gradeDto);
         assertEquals(grade.getId(), gradeDto.getId());
         assertEquals(grade.getTitle(), gradeDto.getTitle());
-        assertEquals("John Doe M.", gradeDto.getClassTeacher());
+        assertEquals("Sara Doe M.", gradeDto.getClassTeacher());
         assertEquals(0, gradeDto.getStudentCount());
         assertEquals(grade.getCreationDate(), gradeDto.getCreationDate());
         assertEquals(grade.getIsActive(), gradeDto.getIsActive());

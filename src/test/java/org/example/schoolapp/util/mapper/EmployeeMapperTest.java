@@ -43,33 +43,43 @@ class EmployeeMapperTest {
 
     @BeforeEach
     void setUp() {
-        user = new User();
-        user.setId(1L);
-        user.setFirstName("John");
-        user.setLastName("Doe");
+        user = User.builder()
+                .id(1L)
+                .username("john")
+                .firstName("John")
+                .lastName("Doe")
+                .email("john.doe@example.com")
+                .build();
 
-        subject = new Subject();
-        subject.setId(100L);
-        subject.setTitle("Mathematics");
+        subject = Subject.builder()
+                .id(100L)
+                .title("Mathematics")
+                .build();
 
-        employee = new Employee();
-        employee.setId(10L);
-        employee.setPosition("Teacher");
-        employee.setSalary(5000);
-        employee.setUser(user);
-        employee.setSubjectSet(Set.of(subject));
+        employee = Employee.builder()
+                .id(10L)
+                .position("Teacher")
+                .salary(5000)
+                .user(user)
+                .subjectSet(Set.of(subject))
+                .build();
 
-        employeeDroRequest = new EmployeeDroRequest();
-        employeeDroRequest.setId(10L);
-        employeeDroRequest.setPosition("Teacher");
-        employeeDroRequest.setSalary(5000);
-        employeeDroRequest.setUserId(1L);
-        employeeDroRequest.setSubjectSet(Set.of(100L));
+        employeeDroRequest = EmployeeDroRequest.builder()
+                .id(10L)
+                .position("Teacher")
+                .salary(5000)
+                .userId(1L)
+                .subjectSet(Set.of(100L))
+                .build();
 
-        UserDto userDto = new UserDto();
-        userDto.setId(1L);
-        userDto.setFirstName("John");
-        userDto.setLastName("Doe");
+        UserDto userDto = UserDto.builder()
+                .id(1L)
+                .username("john")
+                .firstName("John")
+                .lastName("Doe")
+                .email("john.doe@example.com")
+                .build();
+
 
         lenient().when(userMapper.toUserDto(user)).thenReturn(userDto);
         lenient().when(userService.getEntityById(1L)).thenReturn(user);

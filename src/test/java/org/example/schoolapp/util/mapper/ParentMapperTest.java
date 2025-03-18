@@ -2,9 +2,8 @@ package org.example.schoolapp.util.mapper;
 
 import org.example.schoolapp.dto.request.ParentDtoRequest;
 import org.example.schoolapp.dto.response.ParentDto;
-import org.example.schoolapp.entity.Parent;
-import org.example.schoolapp.entity.Student;
-import org.example.schoolapp.entity.User;
+import org.example.schoolapp.entity.*;
+import org.example.schoolapp.enums.ParentStatus;
 import org.example.schoolapp.service.UserService;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -13,9 +12,9 @@ import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 
-import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
+import java.util.Set;
 
 import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.Mockito.*;
@@ -36,20 +35,63 @@ class ParentMapperTest {
 
     @BeforeEach
     void setUp() {
-        user = new User();
-        user.setId(1L);
-        user.setFirstName("John");
-        user.setLastName("Doe");
+        user = User.builder()
+                .id(1L)
+                .username("john")
+                .firstName("John")
+                .lastName("Doe")
+                .email("john.doe@example.com")
+                .build();
 
-        parent = new Parent();
-        parent.setId(2L);
-        parent.setUser(user);
+        parent = Parent.builder()
+                .id(2L)
+                .user(user)
+                .build();
 
-        Student child = new Student();
-        User childUser = new User();
-        childUser.setFirstName("Jane");
-        childUser.setLastName("Doe");
-        child.setUser(childUser);
+        Subject subject = Subject.builder()
+                .id(1L)
+                .title("Math")
+                .description("Algebra and Geometry")
+                .build();
+
+        User teacherUser = User.builder()
+                .id(1L)
+                .username("mara")
+                .firstName("Mara")
+                .lastName("Ave")
+                .email("mara.ave@example.com")
+                .build();
+
+        Employee teacher = Employee.builder()
+                .id(10L)
+                .position("Teacher")
+                .salary(5000)
+                .user(teacherUser)
+                .subjectSet(Set.of(subject))
+                .build();
+
+        Grade grade = Grade.builder()
+                .id(1L)
+                .classTeacher(teacher)
+                .title("10B")
+                .build();
+
+        User childUser = User.builder()
+                .id(1L)
+                .username("sara")
+                .firstName("Sara")
+                .lastName("Doe")
+                .email("sara.doe@example.com")
+                .build();
+
+        Student child = Student.builder()
+                .id(10L)
+                .parent(parent)
+                .user(childUser)
+                .grade(grade)
+                .parentStatus(ParentStatus.FATHER)
+                .build();
+
         parent.setChildrenList(Collections.singletonList(child));
     }
 
@@ -60,15 +102,15 @@ class ParentMapperTest {
         assertNotNull(parentDto);
         assertEquals(2L, parentDto.getId());
         assertEquals(1, parentDto.getChildrenNameList().size());
-        assertEquals("Jane Doe", parentDto.getChildrenNameList().get(0));
+        assertEquals("Sara Doe", parentDto.getChildrenNameList().get(0));
     }
 
     @Test
     void testToParentDtoList() {
-        List<ParentDto> parentDtos = parentMapper.toParentDtoList(Arrays.asList(parent));
+        List<ParentDto> parentDto = parentMapper.toParentDtoList(Collections.singletonList(parent));
 
-        assertNotNull(parentDtos);
-        assertEquals(1, parentDtos.size());
+        assertNotNull(parentDto);
+        assertEquals(1, parentDto.size());
     }
 
     @Test

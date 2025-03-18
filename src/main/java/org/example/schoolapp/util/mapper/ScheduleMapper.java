@@ -59,7 +59,7 @@ public class ScheduleMapper {
 
     private String teacherToString(Schedule schedule) {
         User teacher = schedule.getTeacherSchedule().getUser();
-        return teacher.getFirstName() + teacher.getLastName();
+        return teacher.getFirstName() + " " + teacher.getLastName();
     }
 
     private DaysOfWeek stringToDayOfWeek(ScheduleDtoRequest scheduleDtoRequest) {

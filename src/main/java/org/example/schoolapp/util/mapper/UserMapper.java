@@ -65,8 +65,10 @@ public class UserMapper {
     private Set<Role> idToRole(UserDtoRequest userDtoRequest) {
         Set<Role> roleSet = new HashSet<>();
 
-        for (Long r : userDtoRequest.getRoleSet())
-            roleSet.add(roleService.findById(r));
+        if (userDtoRequest.getRoleSet() != null)
+            for (Long r : userDtoRequest.getRoleSet())
+                roleSet.add(roleService.findById(r));
+
 
         return roleSet;
     }
