@@ -16,6 +16,6 @@ public interface RoleService {
     RoleDto createRole(RoleDto role);
     RoleDto updateRole(RoleDto role);
 
-    Role addUser(Role role, User user);
-    Role removeUser(Role role, User user);
+    void addUser(Role role, User user);
+    void removeUser(Role role, User user);
 }

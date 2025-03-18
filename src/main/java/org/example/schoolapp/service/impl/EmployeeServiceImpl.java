@@ -13,7 +13,6 @@ import org.example.schoolapp.util.exception.ObjectNotFoundException;
 import org.example.schoolapp.util.mapper.EmployeeMapper;
 import org.springframework.stereotype.Service;
 
-import java.util.ArrayList;
 import java.util.List;
 
 @Service
@@ -43,12 +42,6 @@ public class EmployeeServiceImpl implements EmployeeService {
     @Override
     public EmployeeDto getDtoById(Long id) {
         return employeeMapper.toEmployeeDto(findByIdEntity(id));
-    }
-
-    @Override
-    public Employee getByUserId(Long id) {
-        return employeeRepository.findByUserId(id)
-                .orElseThrow(() -> new ObjectNotFoundException("Employee with userId: '" + id + "' not found"));
     }
 
     @Override

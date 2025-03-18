@@ -26,7 +26,7 @@ public interface ScheduleService {
     ScheduleDto createSchedule(ScheduleDtoRequest scheduleDtoRequest);
     ScheduleDto updateSchedule(ScheduleDtoRequest scheduleDtoRequest);
 
-    ScheduleDto deleteSchedule(Long id);
+    void deleteSchedule(Long id);
     ScheduleDto restoreSchedule(Long id);
 
     ScheduleDto approveSchedule(Long id);

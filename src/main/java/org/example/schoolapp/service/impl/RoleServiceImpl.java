@@ -64,18 +64,18 @@ public class RoleServiceImpl implements RoleService {
     }
 
     @Override
-    public Role addUser(Role role, User user) {
+    public void addUser(Role role, User user) {
         Set<User> roleSet = role.getUserSet();
         roleSet.add(user);
         role.setUserSet(roleSet);
-        return save(role);
+        save(role);
     }
 
     @Override
-    public Role removeUser(Role role, User user) {
+    public void removeUser(Role role, User user) {
         Set<User> roleSet = role.getUserSet();
         roleSet.remove(user);
         role.setUserSet(roleSet);
-        return save(role);
+        save(role);
     }
 }

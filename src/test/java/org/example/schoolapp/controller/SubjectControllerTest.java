@@ -3,6 +3,7 @@ package org.example.schoolapp.controller;
 import org.example.schoolapp.dto.request.SubjectDtoRequest;
 import org.example.schoolapp.dto.response.SubjectDto;
 import org.example.schoolapp.service.SubjectService;
+import org.example.schoolapp.util.exception.GlobalExceptionHandler;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.mockito.InjectMocks;
@@ -12,12 +13,15 @@ import org.springframework.http.MediaType;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.setup.MockMvcBuilders;
 
+import java.util.Collections;
 import java.util.List;
 
-import static org.mockito.Mockito.*;
+import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.anyLong;
+import static org.mockito.ArgumentMatchers.anyString;
+import static org.mockito.Mockito.when;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
-import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
 class SubjectControllerTest {
 
@@ -32,81 +36,148 @@ class SubjectControllerTest {
     @BeforeEach
     void setUp() {
         MockitoAnnotations.openMocks(this);
-        mockMvc = MockMvcBuilders.standaloneSetup(subjectController).build();
+        mockMvc = MockMvcBuilders.standaloneSetup(subjectController)
+                .setControllerAdvice(new GlobalExceptionHandler())
+                .build();
     }
 
     @Test
-    void getSubjectById_ShouldReturnSubject() throws Exception {
-        Long subjectId = 1L;
-        SubjectDto subjectDto = SubjectDto.builder()
-                .id(subjectId)
-                .title("Mathematics")
-                .isActive(true)
-                .build();
+    void getSubjectById() throws Exception {
+        SubjectDto subjectDto = new SubjectDto();
+        subjectDto.setId(1L);
+        subjectDto.setTitle("Mathematics");
 
-        when(subjectService.getDtoById(subjectId)).thenReturn(subjectDto);
+        when(subjectService.getDtoById(anyLong())).thenReturn(subjectDto);
 
-        mockMvc.perform(get("/ap1/v1/subject/get-subject-by-id/" + subjectId))
+        mockMvc.perform(get("/ap1/v1/subject/get-subject-by-id/1"))
                 .andExpect(status().isOk())
-                .andExpect(jsonPath("$.message").value("Successfully retrieved Subject with Id: " + subjectId))
-                .andExpect(jsonPath("$.data.id").value(subjectId))
+                .andExpect(jsonPath("$.message").value("Successfully retrieved Subject with Id: 1"))
+                .andExpect(jsonPath("$.data.id").value(1L))
                 .andExpect(jsonPath("$.data.title").value("Mathematics"));
     }
 
     @Test
-    void getSubjectByTitle_ShouldReturnSubject() throws Exception {
-        String title = "Physics";
-        SubjectDto subjectDto = SubjectDto.builder()
-                .id(2L)
-                .title(title)
-                .isActive(true)
-                .build();
+    void getSubjectByTitle() throws Exception {
+        SubjectDto subjectDto = new SubjectDto();
+        subjectDto.setId(1L);
+        subjectDto.setTitle("Mathematics");
 
-        when(subjectService.getByTitle(title)).thenReturn(subjectDto);
+        when(subjectService.getByTitle(anyString())).thenReturn(subjectDto);
 
-        mockMvc.perform(get("/ap1/v1/subject/get-subject-by-title/" + title))
+        mockMvc.perform(get("/ap1/v1/subject/get-subject-by-title/Mathematics"))
                 .andExpect(status().isOk())
-                .andExpect(jsonPath("$.message").value("Successfully retrieved Subject with title: " + title))
-                .andExpect(jsonPath("$.data.title").value(title));
+                .andExpect(jsonPath("$.message").value("Successfully retrieved Subject with title: Mathematics"))
+                .andExpect(jsonPath("$.data.id").value(1L))
+                .andExpect(jsonPath("$.data.title").value("Mathematics"));
     }
 
     @Test
-    void getAllSubjects_ShouldReturnListOfSubjects() throws Exception {
-        List<SubjectDto> subjects = List.of(SubjectDto.builder()
-                .id(1L)
-                .title("Math")
-                .isActive(true)
-                .build());
-        when(subjectService.getAllSubject()).thenReturn(subjects);
+    void getAllSubjects() throws Exception {
+        SubjectDto subjectDto = new SubjectDto();
+        subjectDto.setId(1L);
+        subjectDto.setTitle("Mathematics");
+
+        when(subjectService.getAllSubject()).thenReturn(List.of(subjectDto));
 
         mockMvc.perform(get("/ap1/v1/subject/get-all-subject"))
                 .andExpect(status().isOk())
-                .andExpect(jsonPath("$.data[0].title").value("Math"));
+                .andExpect(jsonPath("$.message").value("Successfully got all Subjects."))
+                .andExpect(jsonPath("$.data[0].id").value(1L))
+                .andExpect(jsonPath("$.data[0].title").value("Mathematics"));
     }
 
     @Test
-    void createSubject_ShouldReturnCreatedSubject() throws Exception {
-        SubjectDtoRequest request = SubjectDtoRequest.builder().title("Chemistry").build();
-        SubjectDto subjectDto = SubjectDto.builder()
-                .id(3L)
-                .title("Chemistry")
-                .isActive(true)
-                .build();
+    void getAllSubjects_EmptyList() throws Exception {
+        when(subjectService.getAllSubject()).thenReturn(Collections.emptyList());
+
+        mockMvc.perform(get("/ap1/v1/subject/get-all-subject"))
+                .andExpect(status().isNotFound()) // Expect 404 status
+                .andExpect(jsonPath("$.message").value("No subjects found."))
+                .andExpect(jsonPath("$.status").value(404))
+                .andExpect(jsonPath("$.error").value("Not Found"));
+    }
+
+    @Test
+    void getAllActiveSubjects() throws Exception {
+        SubjectDto subjectDto = new SubjectDto();
+        subjectDto.setId(1L);
+        subjectDto.setTitle("Mathematics");
+        subjectDto.setIsActive(true);
+
+        when(subjectService.getAllActiveSubject()).thenReturn(List.of(subjectDto));
+
+        mockMvc.perform(get("/ap1/v1/subject/get-all-active-subject"))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.message").value("Successfully got all active Subjects."))
+                .andExpect(jsonPath("$.data[0].id").value(1L))
+                .andExpect(jsonPath("$.data[0].title").value("Mathematics"))
+                .andExpect(jsonPath("$.data[0].isActive").value(true));
+    }
+
+    @Test
+    void getAllActiveSubjects_EmptyList() throws Exception {
+        when(subjectService.getAllActiveSubject()).thenReturn(Collections.emptyList());
+
+        mockMvc.perform(get("/ap1/v1/subject/get-all-active-subject"))
+                .andExpect(status().isNotFound()) // Expect 404 status
+                .andExpect(jsonPath("$.message").value("No subjects found."))
+                .andExpect(jsonPath("$.status").value(404))
+                .andExpect(jsonPath("$.error").value("Not Found"));
+    }
+
+    @Test
+    void createSubject() throws Exception {
+        SubjectDto subjectDto = new SubjectDto();
+        subjectDto.setId(1L);
+        subjectDto.setTitle("Mathematics");
 
         when(subjectService.createSubject(any(SubjectDtoRequest.class))).thenReturn(subjectDto);
 
         mockMvc.perform(post("/ap1/v1/subject/create-subject")
                         .contentType(MediaType.APPLICATION_JSON)
-                        .content("{\"title\":\"Chemistry\"}"))
+                        .content("{\"title\": \"Mathematics\", \"description\": \"Math subject\"}"))
                 .andExpect(status().isCreated())
-                .andExpect(jsonPath("$.data.title").value("Chemistry"));
+                .andExpect(jsonPath("$.message").value("Successfully created Subject."))
+                .andExpect(jsonPath("$.data.id").value(1L))
+                .andExpect(jsonPath("$.data.title").value("Mathematics"));
     }
 
     @Test
-    void deleteSubject_ShouldReturnSuccessMessage() throws Exception {
-        Long subjectId = 1L;
-        mockMvc.perform(delete("/ap1/v1/subject/delete-subject/1", subjectId))
+    void updateSubject() throws Exception {
+        SubjectDto subjectDto = new SubjectDto();
+        subjectDto.setId(1L);
+        subjectDto.setTitle("Updated Mathematics");
+
+        when(subjectService.updateSubject(any(SubjectDtoRequest.class))).thenReturn(subjectDto);
+
+        mockMvc.perform(put("/ap1/v1/subject/update-subject")
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content("{\"id\": 1, \"title\": \"Updated Mathematics\"}"))
                 .andExpect(status().isOk())
-                .andExpect(jsonPath("$.message").value("Successfully deleted Subject with id: " + subjectId));
+                .andExpect(jsonPath("$.message").value("Successfully updated Subject with id: 1"))
+                .andExpect(jsonPath("$.data.id").value(1L))
+                .andExpect(jsonPath("$.data.title").value("Updated Mathematics"));
+    }
+
+    @Test
+    void deleteSubject() throws Exception {
+        mockMvc.perform(delete("/ap1/v1/subject/delete-subject/1"))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.message").value("Successfully deleted Subject with id: 1"));
+    }
+
+    @Test
+    void restoreSubject() throws Exception {
+        SubjectDto subjectDto = new SubjectDto();
+        subjectDto.setId(1L);
+        subjectDto.setTitle("Restored Mathematics");
+
+        when(subjectService.restoreSubject(anyLong())).thenReturn(subjectDto);
+
+        mockMvc.perform(put("/ap1/v1/subject/restore-subject/1"))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.message").value("Successfully restored Subject with id: 1"))
+                .andExpect(jsonPath("$.data.id").value(1L))
+                .andExpect(jsonPath("$.data.title").value("Restored Mathematics"));
     }
 }

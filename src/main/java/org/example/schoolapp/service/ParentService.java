@@ -17,8 +17,6 @@ public interface ParentService {
     List<ParentDto> getAllParent();
     List<ParentDto> getAllActiveParent();
 
-    ParentDto getParentByStudentId(Long id);
-
     ParentDto createParent(ParentDtoRequest parentDtoRequest);
     ParentDto updateParent(ParentDtoRequest parentDtoRequest);
 

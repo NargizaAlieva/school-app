@@ -21,7 +21,6 @@ public class ScheduleServiceImpl implements ScheduleService {
     private final ScheduleRepository scheduleRepository;
     private final ScheduleMapper scheduleMapper;
     private final StudentService studentService;
-    private final EmployeeService employeeService;
 
     public List<Schedule> getAllScheduleEntity() {
         return scheduleRepository.findAll();
@@ -120,14 +119,14 @@ public class ScheduleServiceImpl implements ScheduleService {
     }
 
     @Override
-    public ScheduleDto deleteSchedule(Long id) {
+    public void deleteSchedule(Long id) {
         Schedule schedule = getScheduleByIdEntity(id);
 
         if (!schedule.getIsActive())
             throw new AlreadyDisabledException("Schedule", id);
 
         schedule.setIsActive(false);
-        return scheduleMapper.toScheduleDto(save(schedule));
+        scheduleMapper.toScheduleDto(save(schedule));
     }
 
     @Override

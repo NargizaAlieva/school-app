@@ -4,7 +4,6 @@ import lombok.RequiredArgsConstructor;
 
 import org.example.schoolapp.dto.request.GradeDtoRequest;
 import org.example.schoolapp.dto.response.GradeDto;
-import org.example.schoolapp.dto.response.LessonDto;
 import org.example.schoolapp.entity.Grade;
 import org.example.schoolapp.repository.GradeRepository;
 import org.example.schoolapp.service.GradeService;
@@ -15,8 +14,6 @@ import org.example.schoolapp.util.mapper.GradeMapper;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
-import java.util.Set;
-import java.util.stream.Collectors;
 
 @Service
 @RequiredArgsConstructor
@@ -85,14 +82,14 @@ public class GradeServiceImpl implements GradeService {
     }
 
     @Override
-    public GradeDto deleteGrade(Long id) {
+    public void deleteGrade(Long id) {
         Grade grade = getByIdEntity(id);
 
         if (!grade.getIsActive())
             throw new AlreadyDisabledException("Grade", id);
 
         grade.setIsActive(false);
-        return gradeMapper.toGradeDto(save(grade));
+        gradeMapper.toGradeDto(save(grade));
     }
 
     @Override

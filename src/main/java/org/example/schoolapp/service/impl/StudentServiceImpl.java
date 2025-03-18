@@ -38,12 +38,6 @@ public class StudentServiceImpl implements StudentService {
     }
 
     @Override
-    public Student getStudentByUserId(Long id) {
-        return studentRepository.findByUserId(id)
-                .orElseThrow(() -> new ObjectNotFoundException("Student with userId: '" + id + "' not found"));
-    }
-
-    @Override
     public List<StudentDto> getAllStudent() {
         return studentMapper.toStudentDtoList(studentRepository.findAll());
     }
@@ -56,19 +50,13 @@ public class StudentServiceImpl implements StudentService {
 
     @Override
     public List<StudentDto> getStudentByParentId(Long parentId) {
-        List<Student> students = studentRepository.getParentStudentsByParentId(parentId);
+        List<Student> students = studentRepository.findParentStudentsByParentId(parentId);
         return studentMapper.toStudentDtoList(students);
     }
 
     @Override
     public List<StudentDto> getAllStudentByGrade(Long gradeId) {
         List<Student> students = studentRepository.findAllActiveStudentsByGrade(gradeId);
-        return studentMapper.toStudentDtoList(students);
-    }
-
-    @Override
-    public List<StudentDto> getAllStudentByGrades(List<Long> gradeIds) {
-        List<Student> students = studentRepository.findAllActiveStudentsByGrades(gradeIds);
         return studentMapper.toStudentDtoList(students);
     }
 
@@ -108,10 +96,10 @@ public class StudentServiceImpl implements StudentService {
     }
 
     @Override
-    public StudentDto deleteStudent(Long id) {
+    public void deleteStudent(Long id) {
         Student student = getStudentByIdEntity(id);
         userService.deleteUser(getStudentByIdEntity(id).getUser().getId());
-        return studentMapper.toStudentDto(student);
+        studentMapper.toStudentDto(student);
     }
 
     @Override

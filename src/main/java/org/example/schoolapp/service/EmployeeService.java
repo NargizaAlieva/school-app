@@ -10,7 +10,6 @@ public interface EmployeeService {
     Employee save(Employee employee);
     Employee findByIdEntity(Long id);
     EmployeeDto getDtoById(Long id);
-    Employee getByUserId(Long id);
 
     List<EmployeeDto> getAllEmployee();
     List<EmployeeDto> getAllActiveEmployee();

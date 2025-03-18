@@ -1,7 +1,6 @@
 package org.example.schoolapp.service;
 
 import org.example.schoolapp.dto.request.MarkDtoRequest;
-import org.example.schoolapp.dto.response.LessonDto;
 import org.example.schoolapp.dto.response.MarkDto;
 import org.example.schoolapp.entity.Mark;
 

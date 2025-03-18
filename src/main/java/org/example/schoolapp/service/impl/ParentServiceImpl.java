@@ -70,11 +70,6 @@ public class ParentServiceImpl implements ParentService {
     }
 
     @Override
-    public ParentDto getParentByStudentId(Long id) {
-        return parentMapper.toParentDto(parentRepository.getParentsByStudentId(id));
-    }
-
-    @Override
     public ParentDto createParent(ParentDtoRequest parentDtoRequest) {
         if (isExistByUserId(parentDtoRequest.getUserId()))
             throw new AlreadyExistException("Employee", "userId", parentDtoRequest.getUserId());

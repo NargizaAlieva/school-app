@@ -1,7 +1,7 @@
 package org.example.schoolapp.controller;
 
-import org.example.schoolapp.dto.UserRoleDto;
 import org.example.schoolapp.dto.request.UserDtoRequest;
+import org.example.schoolapp.dto.UserRoleDto;
 import org.example.schoolapp.dto.response.UserDto;
 import org.example.schoolapp.service.UserService;
 import org.junit.jupiter.api.BeforeEach;
@@ -18,10 +18,11 @@ import java.util.HashSet;
 import java.util.List;
 
 import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.anyLong;
+import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.Mockito.when;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
-import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 
 class UserControllerTest {
 
@@ -39,81 +40,187 @@ class UserControllerTest {
         mockMvc = MockMvcBuilders.standaloneSetup(userController).build();
     }
 
-    private UserDto buildUserDto(Long id, String username, String email) {
-        return UserDto.builder()
-                .id(id)
-                .username(username)
-                .email(email)
-                .isActive(true)
-                .build();
-    }
-
-    private UserDtoRequest buildUserDtoRequest(Long id, String username, String email) {
-        return UserDtoRequest.builder()
-                .id(id)
-                .username(username)
-                .email(email)
-                .password("password123")
-                .build();
-    }
-
     @Test
-    void getUserById_shouldReturnUser() throws Exception {
-        UserDto userDto = buildUserDto(1L, "testuser", "test@example.com");
-        when(userService.getById(1L)).thenReturn(userDto);
+    void getUserById() throws Exception {
+        UserDto userDto = new UserDto();
+        userDto.setId(1L);
+        userDto.setUsername("testuser");
+
+        when(userService.getById(anyLong())).thenReturn(userDto);
 
         mockMvc.perform(get("/ap1/v1/user/get-user-by-id/1"))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.message").value("Successfully retrieved User with Id: 1"))
-                .andExpect(jsonPath("$.data.id").value(1))
+                .andExpect(jsonPath("$.data.id").value(1L))
                 .andExpect(jsonPath("$.data.username").value("testuser"));
     }
 
     @Test
-    void createUser_shouldReturnCreatedUser() throws Exception {
-        UserDtoRequest request = buildUserDtoRequest(null, "newuser", "newuser@example.com");
-        UserDto userDto = buildUserDto(2L, "newuser", "newuser@example.com");
+    void getUserByUsername() throws Exception {
+        UserDto userDto = new UserDto();
+        userDto.setId(1L);
+        userDto.setUsername("testuser");
 
-        when(userService.createUser(any(UserDtoRequest.class))).thenReturn(userDto);
+        when(userService.getByUsername(anyString())).thenReturn(userDto);
 
-        mockMvc.perform(post("/ap1/v1/user/create-user")
-                .contentType(MediaType.APPLICATION_JSON)
-                .content("{\"username \":\"newuser\",\"email\":\"newuser@example.com\",\"password\":\"password123\"}"))
-                .andExpect(status().isCreated())
-                .andExpect(jsonPath("$.message").value("Successfully created User."))
-                .andExpect(jsonPath("$.data.username").value("newuser"));
+        mockMvc.perform(get("/ap1/v1/user/get-user-by-username/testuser"))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.message").value("Successfully retrieved User with username: testuser"))
+                .andExpect(jsonPath("$.data.id").value(1L))
+                .andExpect(jsonPath("$.data.username").value("testuser"));
     }
 
     @Test
-    void getAllUsers_shouldReturnUserList() throws Exception {
-        UserDto userDto = buildUserDto(1L, "testuser", "test@example.com");
+    void getUserByEmail() throws Exception {
+        UserDto userDto = new UserDto();
+        userDto.setId(1L);
+        userDto.setEmail("test@example.com");
+
+        when(userService.getByEmail(anyString())).thenReturn(userDto);
+
+        mockMvc.perform(get("/ap1/v1/user/get-user-by-email/test@example.com"))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.message").value("Successfully retrieved User with email: test@example.com"))
+                .andExpect(jsonPath("$.data.id").value(1L))
+                .andExpect(jsonPath("$.data.email").value("test@example.com"));
+    }
+
+    @Test
+    void getAllUsers() throws Exception {
+        UserDto userDto = new UserDto();
+        userDto.setId(1L);
+        userDto.setUsername("testuser");
+
         when(userService.getAllUser()).thenReturn(List.of(userDto));
 
         mockMvc.perform(get("/ap1/v1/user/get-all-user"))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.message").value("Successfully retrieved all Users."))
+                .andExpect(jsonPath("$.data[0].id").value(1L))
                 .andExpect(jsonPath("$.data[0].username").value("testuser"));
     }
 
     @Test
-    void deleteUser_shouldReturnSuccessMessage() throws Exception {
+    void getAllActiveUsers() throws Exception {
+        UserDto userDto = new UserDto();
+        userDto.setId(1L);
+        userDto.setUsername("testuser");
+        userDto.setIsActive(true);
+
+        when(userService.getAllActiveUser()).thenReturn(List.of(userDto));
+
+        mockMvc.perform(get("/ap1/v1/user/get-all-active-user"))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.message").value("Successfully retrieved all active Users."))
+                .andExpect(jsonPath("$.data[0].id").value(1L))
+                .andExpect(jsonPath("$.data[0].username").value("testuser"))
+                .andExpect(jsonPath("$.data[0].isActive").value(true));
+    }
+
+    @Test
+    void getAllUsersByRole() throws Exception {
+        UserDto userDto = new UserDto();
+        userDto.setId(1L);
+        userDto.setUsername("testuser");
+        userDto.setRoleSet(Collections.singleton("ADMIN"));
+
+        when(userService.getUserDtoListWithRole(anyString())).thenReturn(List.of(userDto));
+
+        mockMvc.perform(get("/ap1/v1/user/get-all-user-by-role/ADMIN"))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.message").value("Successfully got all Users with Role:ADMIN"))
+                .andExpect(jsonPath("$.data[0].id").value(1L))
+                .andExpect(jsonPath("$.data[0].username").value("testuser"))
+                .andExpect(jsonPath("$.data[0].roleSet[0]").value("ADMIN"));
+    }
+
+    @Test
+    void createUser() throws Exception {
+        UserDto userDto = new UserDto();
+        userDto.setId(1L);
+        userDto.setUsername("testuser");
+
+        when(userService.createUser(any(UserDtoRequest.class))).thenReturn(userDto);
+
+        mockMvc.perform(post("/ap1/v1/user/create-user")
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content("{\"username\": \"testuser\", \"password\": \"password\"}"))
+                .andExpect(status().isCreated())
+                .andExpect(jsonPath("$.message").value("Successfully created User."))
+                .andExpect(jsonPath("$.data.id").value(1L))
+                .andExpect(jsonPath("$.data.username").value("testuser"));
+    }
+
+    @Test
+    void updateUser() throws Exception {
+        UserDto userDto = new UserDto();
+        userDto.setId(1L);
+        userDto.setUsername("updateduser");
+
+        when(userService.updateUser(any(UserDtoRequest.class))).thenReturn(userDto);
+
+        mockMvc.perform(put("/ap1/v1/user/update-user")
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content("{\"id\": 1, \"username\": \"updateduser\"}"))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.message").value("Successfully updated User with id: 1"))
+                .andExpect(jsonPath("$.data.id").value(1L))
+                .andExpect(jsonPath("$.data.username").value("updateduser"));
+    }
+
+    @Test
+    void deleteUser() throws Exception {
         mockMvc.perform(delete("/ap1/v1/user/delete-user/1"))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.message").value("Successfully deleted User with id: 1"));
     }
 
     @Test
-    void addRoleToUser_shouldReturnUpdatedUser() throws Exception {
-        UserRoleDto request = new UserRoleDto(1L, new HashSet<>(Collections.singletonList(2L)));
-        UserDto userDto = buildUserDto(1L, "testuser", "test@example.com");
+    void restoreUser() throws Exception {
+        UserDto userDto = new UserDto();
+        userDto.setId(1L);
+        userDto.setUsername("restoreduser");
+
+        when(userService.restoreUser(anyLong())).thenReturn(userDto);
+
+        mockMvc.perform(put("/ap1/v1/user/restore-user/1"))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.message").value("Successfully restored User with id: 1"))
+                .andExpect(jsonPath("$.data.id").value(1L))
+                .andExpect(jsonPath("$.data.username").value("restoreduser"));
+    }
+
+    @Test
+    void addRoleToUser() throws Exception {
+        UserDto userDto = new UserDto();
+        userDto.setId(1L);
+        userDto.setRoleSet(new HashSet<>(Collections.singleton("ADMIN")));
 
         when(userService.addRoleToUser(any(UserRoleDto.class))).thenReturn(userDto);
 
         mockMvc.perform(put("/ap1/v1/user/add-role")
                         .contentType(MediaType.APPLICATION_JSON)
-                        .content("{\"userId\":1,\"roleIdSet\":[2]}"))
+                        .content("{\"userId\": 1, \"roleIdSet\": [1]}"))
                 .andExpect(status().isOk())
-                .andExpect(jsonPath("$.message").value("Successfully added Role with ids: '[2]' to user with id: 1"))
-                .andExpect(jsonPath("$.data.username").value("testuser"));
+                .andExpect(jsonPath("$.message").value("Successfully added Role with ids: '[1]' to user with id: 1"))
+                .andExpect(jsonPath("$.data.id").value(1L))
+                .andExpect(jsonPath("$.data.roleSet[0]").value("ADMIN"));
+    }
+
+    @Test
+    void removeRoleFromUser() throws Exception {
+        UserDto userDto = new UserDto();
+        userDto.setId(1L);
+        userDto.setRoleSet(new HashSet<>());
+
+        when(userService.removeRoleFromUser(any(UserRoleDto.class))).thenReturn(userDto);
+
+        mockMvc.perform(put("/ap1/v1/user/remove-role")
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content("{\"userId\": 1, \"roleIdSet\": [1]}"))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.message").value("Successfully removed Role with ids: '[1]' to user with id: 1"))
+                .andExpect(jsonPath("$.data.id").value(1L))
+                .andExpect(jsonPath("$.data.roleSet").isEmpty());
     }
 }

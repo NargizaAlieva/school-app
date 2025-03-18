@@ -5,7 +5,6 @@ import org.example.schoolapp.dto.request.LessonDtoRequest;
 import org.example.schoolapp.entity.Lesson;
 
 import java.util.List;
-import java.util.Map;
 
 public interface LessonService {
     Lesson save(Lesson lesson);

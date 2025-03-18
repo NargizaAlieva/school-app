@@ -2,7 +2,6 @@ package org.example.schoolapp.service.impl;
 
 import lombok.RequiredArgsConstructor;
 import org.example.schoolapp.dto.request.SubjectDtoRequest;
-import org.example.schoolapp.dto.response.ScheduleDto;
 import org.example.schoolapp.dto.response.SubjectDto;
 import org.example.schoolapp.entity.Subject;
 import org.example.schoolapp.repository.SubjectRepository;
@@ -12,8 +11,6 @@ import org.example.schoolapp.util.mapper.SubjectMapper;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
-import java.util.Set;
-import java.util.stream.Collectors;
 
 @Service
 @RequiredArgsConstructor
@@ -63,28 +60,6 @@ public class SubjectServiceImpl implements SubjectService {
     }
 
     @Override
-    public Set<SubjectDto> getSubjectForGrade(Long gradeId, List<ScheduleDto> scheduleDtoList) {
-        Set<Long> subjectIds = scheduleDtoList.stream()
-                .filter(sch -> sch.getGradeId().equals(gradeId))
-                .map(ScheduleDto::getSubjectId)
-                .collect(Collectors.toSet());
-
-        Set<Subject> subjects = subjectRepository.findSubjectsByIds(subjectIds);
-        return subjectMapper.toSubjectDtoSet(subjects);
-    }
-
-    @Override
-    public List<SubjectDto> getSubjectSchedule(List<ScheduleDto> scheduleDtoList) {
-        List<String> subjectTitles = scheduleDtoList.stream()
-                .map(ScheduleDto::getSubjectTitle)
-                .toList();
-
-        List<Subject> subjectList = subjectRepository.findByTitles(subjectTitles);
-
-        return subjectMapper.toSubjectDtoList(subjectList);
-    }
-
-    @Override
     public SubjectDto createSubject(SubjectDtoRequest subjectDtoRequest) {
         if (subjectDtoRequest.getTitle() == null)
             throw new IncorrectRequestException("Subject with title cannot be null");
@@ -127,14 +102,14 @@ public class SubjectServiceImpl implements SubjectService {
     }
 
     @Override
-    public SubjectDto deleteSubject(Long id) {
+    public void deleteSubject(Long id) {
         Subject subject = findByIdEntity(id);
 
         if (!subject.getIsActive())
             throw new AlreadyDisabledException("Subject", id);
 
         subject.setIsActive(false);
-        return subjectMapper.toSubjectDto(save(subject));
+        subjectMapper.toSubjectDto(save(subject));
     }
 
     @Override

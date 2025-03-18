@@ -11,17 +11,13 @@ import org.example.schoolapp.util.exception.ObjectNotFoundException;
 import org.example.schoolapp.util.mapper.LessonMapper;
 import org.springframework.stereotype.Component;
 
-import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 
 @Component
 @RequiredArgsConstructor
 public class LessonServiceImpl implements LessonService {
     private final LessonRepository lessonRepository;
     private final LessonMapper lessonMapper;
-    private final ScheduleService scheduleService;
 
     @Override
     public Lesson save(Lesson lesson) {
@@ -96,6 +92,6 @@ public class LessonServiceImpl implements LessonService {
 
     @Override
     public List<LessonDto> getAllLessonBySubjectQuarter(Long subjectId, Long gradeId) {
-        return lessonMapper.toLessonDtoList(lessonRepository.getAllLessonBySubjectQuarter(subjectId, gradeId));
+        return lessonMapper.toLessonDtoList(lessonRepository.getAllLessonBySubjectGrade(subjectId, gradeId));
     }
 }

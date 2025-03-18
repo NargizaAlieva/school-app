@@ -10,12 +10,11 @@ public interface StudentService {
     Student save(Student student);
     Student getStudentByIdEntity(Long id);
     StudentDto getStudentById(Long id);
-    Student getStudentByUserId(Long id);
 
     StudentDto createStudent(StudentDtoRequest studentDtoRequest);
     StudentDto updateStudent(StudentDtoRequest studentDtoRequest);
 
-    StudentDto deleteStudent(Long id);
+    void deleteStudent(Long id);
     StudentDto restoreStudent(Long id);
 
     List<StudentDto> getAllStudent();
@@ -24,5 +23,4 @@ public interface StudentService {
     List<StudentDto> getStudentByParentId(Long parentId);
 
     List<StudentDto> getAllStudentByGrade(Long id);
-    List<StudentDto> getAllStudentByGrades(List<Long> gradeId);
 }
