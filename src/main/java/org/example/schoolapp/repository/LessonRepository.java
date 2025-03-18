@@ -30,7 +30,7 @@ public interface LessonRepository extends JpaRepository<Lesson, Long> {
     @Query("SELECT l FROM Schedule s JOIN s.lessonSchedule l " +
             "WHERE s.subjectSchedule.id = :subjectId " +
             "AND s.gradeSchedule.id = :gradeId")
-    List<Lesson> getAllLessonBySubjectQuarter(@Param("subjectId") Long subjectId,
+    List<Lesson> getAllLessonBySubjectGrade(@Param("subjectId") Long subjectId,
                                               @Param("gradeId") Long gradeId);
 
 }

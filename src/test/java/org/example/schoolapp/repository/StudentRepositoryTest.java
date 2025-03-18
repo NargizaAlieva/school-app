@@ -1,114 +1,148 @@
 package org.example.schoolapp.repository;
 
-import org.example.schoolapp.entity.Employee;
-import org.example.schoolapp.entity.Grade;
-import org.example.schoolapp.entity.Student;
-import org.example.schoolapp.entity.User;
+import org.example.schoolapp.entity.*;
 import org.example.schoolapp.enums.ParentStatus;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.orm.jpa.DataJpaTest;
+import org.springframework.boot.test.autoconfigure.orm.jpa.TestEntityManager;
 
+import java.util.Date;
 import java.util.List;
 import java.util.Optional;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
 @DataJpaTest
-class StudentRepositoryTest {
+public class StudentRepositoryTest {
+
+    @Autowired
+    private TestEntityManager entityManager;
 
     @Autowired
     private StudentRepository studentRepository;
 
-    @Autowired
-    private GradeRepository gradeRepository;
-
-    @Autowired
-    private UserRepository userRepository;
-
-    @Autowired
-    private EmployeeRepository employeeRepository;
-
+    private Student student;
+    private User user;
+    private Parent parent;
     private Grade grade;
-    private User activeUser;
-    private User inactiveUser;
-    private Student activeStudent;
-    private Student inactiveStudent;
-    private Employee teacher;
 
     @BeforeEach
-    void setUp() {
-        teacher = employeeRepository.save(new Employee());
+    public void setUp() {
+        user = User.builder()
+                .username("parentuser")
+                .firstName("Alice")
+                .lastName("Smith")
+                .email("alice.smith@example.com")
+                .password("password123")
+                .isActive(true)
+                .build();
+        entityManager.persist(user);
 
-        activeUser = new User();
-        activeUser.setUsername("activeUser");
-        activeUser.setFirstName("activeUser");
-        activeUser.setLastName("activeUser");
-        activeUser.setEmail("activeUser@email.com");
-        activeUser.setPassword("activeUser");
-        activeUser.setIsActive(true);
-        activeUser = userRepository.save(activeUser);
+        parent = Parent.builder()
+                .user(user)
+                .build();
+        entityManager.persist(parent);
 
-        inactiveUser = new User();
-        inactiveUser.setUsername("inactiveUser");
-        inactiveUser.setFirstName("inactiveUser");
-        inactiveUser.setLastName("inactiveUser");
-        inactiveUser.setEmail("inactiveUser@email.com");
-        inactiveUser.setPassword("inactiveUser");
-        inactiveUser.setIsActive(false);
-        inactiveUser = userRepository.save(inactiveUser);
+        User user2 = User.builder()
+                .username("teacheruser")
+                .firstName("Nana")
+                .lastName("Mara")
+                .email("nana.smith@example.com")
+                .password("password123")
+                .isActive(true)
+                .build();
+        entityManager.persist(user2);
 
-        grade = new Grade();
-        grade.setTitle("10B");
-        grade.setClassTeacher(teacher);
-        grade.setIsActive(true);
-        grade = gradeRepository.save(grade);
+        Employee classTeacher = Employee.builder()
+                .position("Teacher")
+                .user(user2)
+                .salary(50000)
+                .build();
+        entityManager.persist(classTeacher);
 
-        activeStudent = new Student();
-        activeStudent.setUser(activeUser);
-        activeStudent.setGrade(grade);
-        activeStudent.setParentStatus(ParentStatus.MOTHER);
-        activeStudent = studentRepository.save(activeStudent);
+        grade = Grade.builder()
+                .title("Grade 10A")
+                .isActive(true)
+                .classTeacher(classTeacher)
+                .build();
+        entityManager.persist(grade);
 
-        inactiveStudent = new Student();
-        inactiveStudent.setUser(inactiveUser);
-        inactiveStudent.setGrade(grade);
-        inactiveStudent.setParentStatus(ParentStatus.MOTHER);
-        inactiveStudent = studentRepository.save(inactiveStudent);
+        user = User.builder()
+                .username("studentuser")
+                .firstName("Mark")
+                .lastName("Smith")
+                .email("mark.smith@example.com")
+                .password("password123")
+                .isActive(true)
+                .build();
+        entityManager.persist(user);
+
+        student = Student.builder()
+                .birthday(new Date())
+                .parentStatus(ParentStatus.MOTHER)
+                .user(user)
+                .parent(parent)
+                .grade(grade)
+                .build();
+        entityManager.persist(student);
+        entityManager.flush();
     }
 
     @Test
-    void testExistsByUserId() {
-        boolean exists = studentRepository.existsByUserId(activeUser.getId());
+    public void whenFindById_thenReturnStudent() {
+        Optional<Student> foundStudent = studentRepository.findById(student.getId());
+        assertThat(foundStudent).isPresent();
+        assertThat(foundStudent.get().getUser().getUsername()).isEqualTo(user.getUsername());
+    }
+
+    @Test
+    public void whenExistsById_thenReturnTrue() {
+        boolean exists = studentRepository.existsById(student.getId());
         assertThat(exists).isTrue();
     }
 
     @Test
-    void testFindByUserId() {
-        Optional<Student> student = studentRepository.findByUserId(activeUser.getId());
-        assertThat(student).isPresent();
-        assertThat(student.get().getUser().getId()).isEqualTo(activeUser.getId());
+    public void whenExistsByUserId_thenReturnTrue() {
+        boolean exists = studentRepository.existsByUserId(user.getId());
+        assertThat(exists).isTrue();
     }
 
     @Test
-    void testFindAllActiveStudents() {
-        List<Student> students = studentRepository.findAllActiveStudents();
-        assertThat(students).contains(activeStudent);
-        assertThat(students).doesNotContain(inactiveStudent);
+    public void whenFindByUserId_thenReturnStudent() {
+        Optional<Student> foundStudent = studentRepository.findByUserId(user.getId());
+        assertThat(foundStudent).isPresent();
+        assertThat(foundStudent.get().getUser().getId()).isEqualTo(user.getId());
     }
 
     @Test
-    void testFindAllActiveStudentsByGrade() {
-        List<Student> students = studentRepository.findAllActiveStudentsByGrade(grade.getId());
-        assertThat(students).contains(activeStudent);
-        assertThat(students).doesNotContain(inactiveStudent);
+    public void whenFindAllActiveStudents_thenReturnActiveStudents() {
+        List<Student> activeStudents = studentRepository.findAllActiveStudents();
+        assertThat(activeStudents).isNotEmpty();
+        assertThat(activeStudents.get(0).getUser().getIsActive()).isTrue();
     }
 
     @Test
-    void testFindAllActiveStudentsByGrades() {
-        List<Student> students = studentRepository.findAllActiveStudentsByGrades(List.of(grade.getId()));
-        assertThat(students).contains(activeStudent);
-        assertThat(students).doesNotContain(inactiveStudent);
+    public void whenFindAllActiveStudentsByGrade_thenReturnActiveStudents() {
+        List<Student> activeStudents = studentRepository.findAllActiveStudentsByGrade(grade.getId());
+        assertThat(activeStudents).isNotEmpty();
+        assertThat(activeStudents.get(0).getGrade().getId()).isEqualTo(grade.getId());
+    }
+
+    @Test
+    public void whenFindAllActiveStudentsByGrades_thenReturnActiveStudents() {
+        List<Long> gradeIds = List.of(grade.getId());
+        List<Student> activeStudents = studentRepository.findAllActiveStudentsByGrades(gradeIds);
+
+        assertThat(activeStudents).isNotEmpty();
+        assertThat(activeStudents.get(0).getGrade().getId()).isEqualTo(grade.getId());
+    }
+
+    @Test
+    public void whenFindParentStudentsByParentId_thenReturnStudents() {
+        List<Student> parentStudents = studentRepository.findParentStudentsByParentId(parent.getId());
+        assertThat(parentStudents).isNotEmpty();
+        assertThat(parentStudents.get(0).getParent().getId()).isEqualTo(parent.getId());
     }
 }

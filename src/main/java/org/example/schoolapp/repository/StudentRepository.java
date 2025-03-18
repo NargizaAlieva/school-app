@@ -13,7 +13,9 @@ import java.util.Optional;
 @Repository
 public interface StudentRepository extends JpaRepository<Student, Long> {
     boolean existsById(Long id);
+
     boolean existsByUserId(Long userId);
+
     Optional<Student> findByUserId(Long userId);
 
     @Query("SELECT s FROM Student s WHERE s.user.isActive = true")
@@ -25,12 +27,6 @@ public interface StudentRepository extends JpaRepository<Student, Long> {
     @Query("SELECT s FROM Student s WHERE s.grade.id IN :gradeIds AND s.user.isActive = true")
     List<Student> findAllActiveStudentsByGrades(@Param("gradeIds") List<Long> gradeIds);
 
-    @Query("SELECT s FROM Student s JOIN s.user u JOIN u.roleSet r WHERE s.grade.id = :gradeId AND r.id = 7")
-    Optional<Student> findGradeRepresentative(@Param("gradeId") Long gradeId);
-
     @Query("SELECT s FROM Student s JOIN s.parent p WHERE p.id = :parentId")
-    List<Student> getParentStudentsByParentId(@Param("parentId") Long parentId);
-
-    @Query("SELECT s FROM Student s JOIN s.user u JOIN u.roleSet r WHERE s.grade.id IN :gradesId AND r.id = 7")
-    List<Student> findGradeRepresentatives(@Param("gradesId") List<Long> gradesId);
+    List<Student> findParentStudentsByParentId(@Param("parentId") Long parentId);
 }

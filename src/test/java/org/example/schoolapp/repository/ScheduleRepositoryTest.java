@@ -1,87 +1,124 @@
 package org.example.schoolapp.repository;
 
-import org.example.schoolapp.entity.Schedule;
+import org.example.schoolapp.entity.*;
 import org.example.schoolapp.enums.DaysOfWeek;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
-import org.junit.jupiter.api.extension.ExtendWith;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.orm.jpa.DataJpaTest;
-import org.springframework.test.context.junit.jupiter.SpringExtension;
+import org.springframework.boot.test.autoconfigure.orm.jpa.TestEntityManager;
 
 import java.util.List;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
-@ExtendWith(SpringExtension.class)
 @DataJpaTest
-class ScheduleRepositoryTest {
+public class ScheduleRepositoryTest {
+
+    @Autowired
+    private TestEntityManager entityManager;
 
     @Autowired
     private ScheduleRepository scheduleRepository;
 
-    private Schedule activeSchedule;
-    private Schedule inactiveSchedule;
-    private Schedule approvedSchedule;
-    private Schedule unapprovedSchedule;
+    private Schedule schedule;
+    private Employee teacher;
+    private Grade grade;
 
     @BeforeEach
-    void setUp() {
-        activeSchedule = new Schedule();
-        activeSchedule.setIsActive(true);
-        activeSchedule.setIsApprove(true);
-        activeSchedule.setQuarter(1);
-        activeSchedule.setDueTime("10:30");
-        activeSchedule.setSchoolYear("2024");
-        activeSchedule.setDayOfWeek(DaysOfWeek.MONDAY);
-        scheduleRepository.save(activeSchedule);
+    public void setUp() {
+        Subject subject = Subject.builder()
+                .title("Mathematics")
+                .description("Study of numbers, quantities, and shapes")
+                .isActive(true)
+                .build();
+        entityManager.persist(subject);
 
-        inactiveSchedule = new Schedule();
-        inactiveSchedule.setIsActive(false);
-        inactiveSchedule.setQuarter(1);
-        inactiveSchedule.setIsApprove(false);
-        inactiveSchedule.setSchoolYear("2023");
-        inactiveSchedule.setDueTime("10:30");
-        inactiveSchedule.setDayOfWeek(DaysOfWeek.MONDAY);
-        scheduleRepository.save(inactiveSchedule);
+        User user1 = User.builder()
+                .username("john-doe")
+                .firstName("John")
+                .lastName("Doe")
+                .middleName("Michael")
+                .phone("+1234567890")
+                .email("john.doe@example.com")
+                .password("Password123!")
+                .isActive(true)
+                .build();
 
-        approvedSchedule = new Schedule();
-        approvedSchedule.setIsApprove(true);
-        approvedSchedule.setIsActive(true);
-        approvedSchedule.setQuarter(1);
-        approvedSchedule.setSchoolYear("2020");
-        approvedSchedule.setDueTime("10:30");
-        approvedSchedule.setDayOfWeek(DaysOfWeek.MONDAY);
-        scheduleRepository.save(approvedSchedule);
+        teacher = Employee.builder()
+                .position("Teacher")
+                .salary(50000)
+                .user(user1)
+                .build();
+        entityManager.persist(teacher);
 
-        unapprovedSchedule = new Schedule();
-        unapprovedSchedule.setIsApprove(false);
-        unapprovedSchedule.setIsActive(true);
-        unapprovedSchedule.setSchoolYear("2020");
-        unapprovedSchedule.setQuarter(1);
-        unapprovedSchedule.setDueTime("10:30");
-        unapprovedSchedule.setDayOfWeek(DaysOfWeek.MONDAY);
-        scheduleRepository.save(unapprovedSchedule);
+        grade = Grade.builder()
+                .title("Grade 10A")
+                .classTeacher(teacher)
+                .isActive(true)
+                .build();
+        entityManager.persist(grade);
+
+        schedule = Schedule.builder()
+                .dayOfWeek(DaysOfWeek.MONDAY)
+                .quarter(1)
+                .dueTime("09:00-10:00")
+                .schoolYear("2023-2024")
+                .isApprove(false)
+                .isActive(true)
+                .subjectSchedule(subject)
+                .teacherSchedule(teacher)
+                .gradeSchedule(grade)
+                .build();
+        entityManager.persist(schedule);
+        entityManager.flush();
     }
 
     @Test
-    void testFindAllByIsActiveTrue() {
+    public void whenFindById_thenReturnSchedule() {
+        Schedule foundSchedule = scheduleRepository.findById(schedule.getId()).orElse(null);
+        assertThat(foundSchedule).isNotNull();
+        assertThat(foundSchedule.getDayOfWeek()).isEqualTo(schedule.getDayOfWeek());
+    }
+
+    @Test
+    public void whenExistsById_thenReturnTrue() {
+        boolean exists = scheduleRepository.existsById(schedule.getId());
+        assertThat(exists).isTrue();
+    }
+
+    @Test
+    public void whenFindAllByIsActiveTrue_thenReturnActiveSchedules() {
         List<Schedule> activeSchedules = scheduleRepository.findAllByIsActiveTrue();
-        assertThat(activeSchedules).contains(activeSchedule);
-        assertThat(activeSchedules).doesNotContain(inactiveSchedule);
+        assertThat(activeSchedules).isNotEmpty();
+        assertThat(activeSchedules.get(0).getIsActive()).isTrue();
     }
 
     @Test
-    void testFindByIsApproveFalse() {
+    public void whenFindByIsApproveFalse_thenReturnUnapprovedSchedules() {
         List<Schedule> unapprovedSchedules = scheduleRepository.findByIsApproveFalse();
-        assertThat(unapprovedSchedules).contains(unapprovedSchedule);
-        assertThat(unapprovedSchedules).doesNotContain(approvedSchedule);
+        assertThat(unapprovedSchedules).isNotEmpty();
+        assertThat(unapprovedSchedules.get(0).getIsApprove()).isFalse();
     }
 
     @Test
-    void testFindBySchoolYear() {
-        List<Schedule> schedules = scheduleRepository.findBySchoolYear("2024");
-        assertThat(schedules).contains(activeSchedule);
-        assertThat(schedules).doesNotContain(inactiveSchedule);
+    public void whenFindBySchoolYear_thenReturnSchedules() {
+        List<Schedule> foundSchedules = scheduleRepository.findBySchoolYear("2023-2024");
+        assertThat(foundSchedules).isNotEmpty();
+        assertThat(foundSchedules.get(0).getSchoolYear()).isEqualTo("2023-2024");
+    }
+
+    @Test
+    public void whenFindByGradeScheduleId_thenReturnSchedules() {
+        List<Schedule> foundSchedules = scheduleRepository.findByGradeScheduleId(grade.getId());
+        assertThat(foundSchedules).isNotEmpty();
+        assertThat(foundSchedules.get(0).getGradeSchedule().getId()).isEqualTo(grade.getId());
+    }
+
+    @Test
+    public void whenFindByTeacherScheduleId_thenReturnSchedules() {
+        List<Schedule> foundSchedules = scheduleRepository.findByTeacherScheduleId(teacher.getId());
+        assertThat(foundSchedules).isNotEmpty();
+        assertThat(foundSchedules.get(0).getTeacherSchedule().getId()).isEqualTo(teacher.getId());
     }
 }

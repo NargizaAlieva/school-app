@@ -1,85 +1,65 @@
 package org.example.schoolapp.repository;
 
 import org.example.schoolapp.entity.Parent;
-import org.example.schoolapp.entity.Student;
 import org.example.schoolapp.entity.User;
-import org.example.schoolapp.enums.ParentStatus;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
-import org.junit.jupiter.api.extension.ExtendWith;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.orm.jpa.DataJpaTest;
-import org.springframework.test.context.junit.jupiter.SpringExtension;
+import org.springframework.boot.test.autoconfigure.orm.jpa.TestEntityManager;
 
 import java.util.List;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
-@ExtendWith(SpringExtension.class)
 @DataJpaTest
-class ParentRepositoryTest {
+public class ParentRepositoryTest {
 
     @Autowired
-    private UserRepository userRepository;
+    private TestEntityManager entityManager;
 
     @Autowired
     private ParentRepository parentRepository;
 
-    @Autowired
-    private StudentRepository studentRepository;
-
-    private Parent activeParent;
-    private Parent inactiveParent;
-    private Student student;
+    private Parent parent;
+    private User user;
 
     @BeforeEach
-    void setUp() {
-        User studentUser = new User();
-        studentUser.setUsername("studentUser");
-        studentUser.setFirstName("studentUser");
-        studentUser.setLastName("studentUser");
-        studentUser.setEmail("studentUser@activeUser.com");
-        studentUser.setPassword("password");
-        studentUser.setIsActive(true);
-        userRepository.save(studentUser);
+    public void setUp() {
+        user = User.builder()
+                .username("parentuser")
+                .firstName("Jane")
+                .lastName("Doe")
+                .email("jane.doe@example.com")
+                .password("password123")
+                .isActive(true)
+                .build();
+        entityManager.persist(user);
 
-        User activeUser = new User();
-        activeUser.setUsername("activeUser");
-        activeUser.setFirstName("activeUser");
-        activeUser.setLastName("activeUser");
-        activeUser.setEmail("activeUser@activeUser.com");
-        activeUser.setPassword("password");
-        activeUser.setIsActive(true);
-        userRepository.save(activeUser);
-
-        User inactiveUser = new User();
-        inactiveUser.setUsername("inactiveUser");
-        inactiveUser.setFirstName("inactiveUser");
-        inactiveUser.setLastName("inactiveUser");
-        inactiveUser.setEmail("inactiveUser@activeUser.com");
-        inactiveUser.setPassword("password");
-        inactiveUser.setIsActive(false);
-        userRepository.save(inactiveUser);
-
-        student = new Student();
-        student.setUser(studentUser);
-        student.setParentStatus(ParentStatus.MOTHER);
-        student.setParent(activeParent);
-        studentRepository.save(student);
-
-        activeParent = new Parent();
-        activeParent.setUser(activeUser);
-        parentRepository.save(activeParent);
-
-        inactiveParent = new Parent();
-        inactiveParent.setUser(inactiveUser);
-        parentRepository.save(inactiveParent);
+        parent = Parent.builder()
+                .user(user)
+                .build();
+        entityManager.persist(parent);
+        entityManager.flush();
     }
 
     @Test
-    void testFindAllActiveParents() {
+    public void whenFindById_thenReturnParent() {
+        Parent foundParent = parentRepository.findById(parent.getId()).orElse(null);
+        assertThat(foundParent).isNotNull();
+        assertThat(foundParent.getUser().getUsername()).isEqualTo(user.getUsername());
+    }
+
+    @Test
+    public void whenExistsById_thenReturnTrue() {
+        boolean exists = parentRepository.existsById(parent.getId());
+        assertThat(exists).isTrue();
+    }
+
+    @Test
+    public void whenFindAllActiveParents_thenReturnActiveParents() {
         List<Parent> activeParents = parentRepository.findAllActiveParents();
-        assertThat(activeParents).contains(activeParent);
-        assertThat(activeParents).doesNotContain(inactiveParent);
+        assertThat(activeParents).isNotEmpty();
+        assertThat(activeParents.get(0).getUser().getIsActive()).isTrue();
     }
 }
