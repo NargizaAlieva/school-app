@@ -3,6 +3,8 @@ package org.example.schoolapp.util.exception;
 import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.transaction.TransactionSystemException;
+import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
 
@@ -58,6 +60,27 @@ public class GlobalExceptionHandler {
         return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(response);
     }
 
+    @ExceptionHandler(MethodArgumentNotValidException.class)
+    public ResponseEntity<Map<String, Object>> handleValidationException(MethodArgumentNotValidException ex) {
+        System.out.println("Validation error occurred: " + ex.getMessage());
+
+        Map<String, Object> response = new HashMap<>();
+        response.put("timestamp", LocalDateTime.now());
+        response.put("status", HttpStatus.BAD_REQUEST.value());
+        response.put("error", "Validation Error");
+
+        Map<String, String> errors = new HashMap<>();
+        ex.getBindingResult().getFieldErrors().forEach(error -> {
+            System.out.println("Field: " + error.getField() + ", Error: " + error.getDefaultMessage());
+            errors.put(error.getField(), error.getDefaultMessage());
+        });
+
+        response.put("message", "Validation failed");
+        response.put("errors", errors);
+
+        return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(response);
+    }
+
     @ExceptionHandler(IncorrectRequestException.class)
     public ResponseEntity<Map<String, Object>> handleIncorrectRequestException(IncorrectRequestException ex) {
         Map<String, Object> response = new HashMap<>();
@@ -88,13 +111,33 @@ public class GlobalExceptionHandler {
         return ResponseEntity.status(status).body(response);
     }
 
-//    @ExceptionHandler(Exception.class)
-//    public ResponseEntity<Map<String, Object>> handleGlobalException(Exception ex) {
-//        Map<String, Object> response = new HashMap<>();
-//        response.put("timestamp", LocalDateTime.now());
-//        response.put("status", HttpStatus.INTERNAL_SERVER_ERROR.value());
-//        response.put("error", "Internal Server Error");
-//        response.put("message", ex.getMessage());
-//        return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(response);
-//    }
+    @ExceptionHandler(TransactionSystemException.class)
+    public ResponseEntity<Map<String, Object>> handleTransactionSystemException(TransactionSystemException ex) {
+        Throwable rootCause = ex.getRootCause();
+        String errorMessage = "Transaction failed: " + (rootCause != null ? rootCause.getMessage() : ex.getMessage());
+
+        Map<String, Object> response = new HashMap<>();
+        response.put("timestamp", LocalDateTime.now());
+        response.put("status", HttpStatus.INTERNAL_SERVER_ERROR.value());
+        response.put("error", "Internal Server Error");
+        response.put("message", errorMessage);
+        response.put("details", ex.toString());
+
+        return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(response);
+    }
+
+    @ExceptionHandler(Exception.class)
+    public ResponseEntity<Map<String, Object>> handleGlobalException(Exception ex) {
+        System.out.println("Unexpected error occurred: " + ex.getMessage());
+        ex.printStackTrace();
+
+        Map<String, Object> response = new HashMap<>();
+        response.put("timestamp", LocalDateTime.now());
+        response.put("status", HttpStatus.INTERNAL_SERVER_ERROR.value());
+        response.put("error", "Internal Server Error");
+        response.put("message", ex.getMessage());
+        response.put("details", ex.toString());
+
+        return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(response);
+    }
 }

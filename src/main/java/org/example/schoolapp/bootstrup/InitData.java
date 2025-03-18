@@ -167,8 +167,6 @@ public class InitData {
                 .salary(50000)
                 .user(user1)
                 .subjectSet(subjectsFor1)
-                .homeGrades(new ArrayList<>())
-                .scheduleList(new ArrayList<>())
                 .build();
 
         Employee employee2 = Employee.builder()
@@ -319,7 +317,7 @@ public class InitData {
                 .quarter(1)
                 .dueTime("10:30-11:15")
                 .dayOfWeek(DaysOfWeek.MONDAY)
-                .schoolYear("2025")
+                .schoolYear("2024-2025")
                 .isActive(true)
                 .build();
 
@@ -330,7 +328,7 @@ public class InitData {
                 .quarter(1)
                 .dueTime("10:30-11:15")
                 .dayOfWeek(DaysOfWeek.MONDAY)
-                .schoolYear("2025")
+                .schoolYear("2024-2025")
                 .build();
 
         Schedule schedule3 = Schedule.builder()
@@ -340,7 +338,7 @@ public class InitData {
                 .quarter(1)
                 .dueTime("11:15-12:00")
                 .dayOfWeek(DaysOfWeek.MONDAY)
-                .schoolYear("2025")
+                .schoolYear("2024-2025")
                 .build();
 
         scheduleService.save(schedule1);
