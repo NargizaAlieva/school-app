@@ -1,8 +1,11 @@
 package org.example.schoolapp.entity;
 
 import jakarta.persistence.*;
+import jakarta.validation.constraints.Min;
+import jakarta.validation.constraints.NotNull;
 import lombok.*;
 
+import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Set;
 
@@ -20,9 +23,12 @@ public class Employee {
 
     @Column(name = "position")
     private String position;
+
+    @Min(value = 0, message = "Salary cannot be negative")
     @Column(name = "salary")
     private Integer salary;
 
+    @NotNull(message = "User cannot be null")
     @OneToOne(cascade = CascadeType.ALL, fetch = FetchType.LAZY)
     @JoinColumn(name = "user_id", referencedColumnName = "id")
     private User user;

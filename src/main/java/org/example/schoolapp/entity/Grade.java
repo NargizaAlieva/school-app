@@ -1,6 +1,8 @@
 package org.example.schoolapp.entity;
 
 import jakarta.persistence.*;
+import jakarta.validation.constraints.NotBlank;
+import jakarta.validation.constraints.NotNull;
 import lombok.*;
 
 import java.time.LocalDateTime;
@@ -10,9 +12,9 @@ import java.util.Set;
 
 @Entity
 @Table(name = "grades")
-@Builder(toBuilder = true)
 @Getter
 @Setter
+@Builder(toBuilder = true)
 @AllArgsConstructor
 @NoArgsConstructor
 public class Grade {
@@ -20,32 +22,33 @@ public class Grade {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    @Column(name = "grade_title")
+    @NotNull(message = "Grade title cannot be null")
+    @NotBlank(message = "Grade title cannot be blank")
+    @Column(name = "grade_title", nullable = false, unique = true)
     private String title;
+
     @Column(name = "is_active", nullable = false)
-    private Boolean isActive;
-    @Column(name = "creation_date")
+    private Boolean isActive = true;
+
+    @Column(name = "creation_date", nullable = false, updatable = false)
     private LocalDateTime creationDate;
 
-    @ManyToOne
+    @NotNull(message = "Class Teacher cannot be null")
+    @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "teacher_id", referencedColumnName = "id")
     private Employee classTeacher;
 
-    @OneToMany(fetch = FetchType.EAGER, mappedBy = "grade")
-    private Set<Student> studentSet;
+    @OneToMany(mappedBy = "grade", fetch = FetchType.LAZY, cascade = CascadeType.ALL, orphanRemoval = true)
+    private Set<Student> studentSet = new HashSet<>();
 
-    @OneToMany(fetch = FetchType.LAZY, mappedBy = "gradeSchedule")
+    @OneToMany(mappedBy = "gradeSchedule", fetch = FetchType.LAZY, cascade = CascadeType.ALL, orphanRemoval = true)
     private List<Schedule> scheduleList;
 
     @PrePersist
     private void prePersist() {
-        if(creationDate == null)
+        if (creationDate == null)
             creationDate = LocalDateTime.now();
-
         if (isActive == null)
             isActive = true;
-
-        if (studentSet == null)
-            studentSet = new HashSet<>();
     }
 }
