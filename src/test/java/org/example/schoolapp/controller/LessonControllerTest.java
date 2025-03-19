@@ -87,7 +87,7 @@ class LessonControllerTest {
                 .andExpect(status().isNotFound())
                 .andExpect(jsonPath("$.message").value("No Lessons found."))
                 .andExpect(jsonPath("$.status").value(404))
-                .andExpect(jsonPath("$.error").value("Not Found"));
+                .andExpect(jsonPath("$.error").value("Resource not found"));
     }
 
     @Test
@@ -117,7 +117,7 @@ class LessonControllerTest {
                 .andExpect(status().isNotFound())
                 .andExpect(jsonPath("$.message").value("No Lessons with teacherId: 1 found."))
                 .andExpect(jsonPath("$.status").value(404))
-                .andExpect(jsonPath("$.error").value("Not Found"));
+                .andExpect(jsonPath("$.error").value("Resource not found"));
     }
 
     @Test
@@ -147,7 +147,7 @@ class LessonControllerTest {
                 .andExpect(status().isNotFound())
                 .andExpect(jsonPath("$.message").value("No Lessons with gradeId: 1 found."))
                 .andExpect(jsonPath("$.status").value(404))
-                .andExpect(jsonPath("$.error").value("Not Found"));
+                .andExpect(jsonPath("$.error").value("Resource not found"));
     }
 
     @Test
@@ -177,7 +177,7 @@ class LessonControllerTest {
                 .andExpect(status().isNotFound())
                 .andExpect(jsonPath("$.message").value("No Lessons with subjectId: 1 found."))
                 .andExpect(jsonPath("$.status").value(404))
-                .andExpect(jsonPath("$.error").value("Not Found"));
+                .andExpect(jsonPath("$.error").value("Resource not found"));
     }
 
     @Test
@@ -207,7 +207,7 @@ class LessonControllerTest {
                 .andExpect(status().isNotFound())
                 .andExpect(jsonPath("$.message").value("No Lessons with year: 2023 found."))
                 .andExpect(jsonPath("$.status").value(404))
-                .andExpect(jsonPath("$.error").value("Not Found"));
+                .andExpect(jsonPath("$.error").value("Resource not found"));
     }
 
     @Test
@@ -237,7 +237,7 @@ class LessonControllerTest {
                 .andExpect(status().isNotFound()) // Expect 404 status
                 .andExpect(jsonPath("$.message").value("No Lessons with quarter: 1 found."))
                 .andExpect(jsonPath("$.status").value(404))
-                .andExpect(jsonPath("$.error").value("Not Found"));
+                .andExpect(jsonPath("$.error").value("Resource not found"));
     }
 
     @Test
@@ -267,7 +267,7 @@ class LessonControllerTest {
                 .andExpect(status().isNotFound())
                 .andExpect(jsonPath("$.message").value("No Lessons with subjectId: 1 and gradeId: 1 found."))
                 .andExpect(jsonPath("$.status").value(404))
-                .andExpect(jsonPath("$.error").value("Not Found"));
+                .andExpect(jsonPath("$.error").value("Resource not found"));
     }
 
     @Test

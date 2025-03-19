@@ -21,6 +21,10 @@ public class ParentServiceImpl implements ParentService {
     private final ParentMapper parentMapper;
     private final UserService userService;
 
+    public Parent getParentById(Long id) {
+        return parentRepository.findById(id).orElseThrow(() -> new ObjectNotFoundException("Parent with id: '" + id + "' not found"));
+    }
+
     public List<Parent> getAllParentEntity(){
         return parentRepository.findAll();
     }
@@ -99,13 +103,13 @@ public class ParentServiceImpl implements ParentService {
 
     @Override
     public void deleteParent(Long id) {
-        Parent parent = getParentByUserId(id);
+        Parent parent = getParentById(id);
         userService.deleteUser(parent.getUser().getId());
     }
 
     @Override
     public ParentDto restoreParent(Long id) {
-        Parent parent = getParentByUserId(id);
+        Parent parent = getParentById(id);
         userService.restoreUser(parent.getUser().getId());
         return parentMapper.toParentDto(parent);
     }

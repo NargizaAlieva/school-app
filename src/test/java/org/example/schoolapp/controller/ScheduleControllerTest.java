@@ -116,7 +116,7 @@ class ScheduleControllerTest {
                 .andExpect(status().isNotFound())
                 .andExpect(jsonPath("$.message").value("No Schedules found."))
                 .andExpect(jsonPath("$.status").value(404))
-                .andExpect(jsonPath("$.error").value("Not Found"));
+                .andExpect(jsonPath("$.error").value("Resource not found"));
     }
 
     @Test
@@ -160,7 +160,7 @@ class ScheduleControllerTest {
                 .andExpect(status().isNotFound())
                 .andExpect(jsonPath("$.message").value("No active Schedules found."))
                 .andExpect(jsonPath("$.status").value(404))
-                .andExpect(jsonPath("$.error").value("Not Found"));
+                .andExpect(jsonPath("$.error").value("Resource not found"));
     }
 
     @Test
@@ -204,7 +204,7 @@ class ScheduleControllerTest {
                 .andExpect(status().isNotFound())
                 .andExpect(jsonPath("$.message").value("No unapproved Schedules found."))
                 .andExpect(jsonPath("$.status").value(404))
-                .andExpect(jsonPath("$.error").value("Not Found"));
+                .andExpect(jsonPath("$.error").value("Resource not found"));
     }
 
     @Test
@@ -248,7 +248,7 @@ class ScheduleControllerTest {
                 .andExpect(status().isNotFound())
                 .andExpect(jsonPath("$.message").value("No Schedules with teacherId: 1 found."))
                 .andExpect(jsonPath("$.status").value(404))
-                .andExpect(jsonPath("$.error").value("Not Found"));
+                .andExpect(jsonPath("$.error").value("Resource not found"));
     }
 
     @Test
@@ -292,7 +292,7 @@ class ScheduleControllerTest {
                 .andExpect(status().isNotFound())
                 .andExpect(jsonPath("$.message").value("No Schedules with gradeId: 1 found."))
                 .andExpect(jsonPath("$.status").value(404))
-                .andExpect(jsonPath("$.error").value("Not Found"));
+                .andExpect(jsonPath("$.error").value("Resource not found"));
     }
 
     @Test
@@ -336,7 +336,7 @@ class ScheduleControllerTest {
                 .andExpect(status().isNotFound()) // Expect 404 status
                 .andExpect(jsonPath("$.message").value("No Schedules with studentId: 1 found."))
                 .andExpect(jsonPath("$.status").value(404))
-                .andExpect(jsonPath("$.error").value("Not Found"));
+                .andExpect(jsonPath("$.error").value("Resource not found"));
     }
 
     @Test
@@ -377,10 +377,10 @@ class ScheduleControllerTest {
         when(scheduleService.getAllScheduleByYear(anyString())).thenReturn(Collections.emptyList());
 
         mockMvc.perform(get("/ap1/v1/schedule/get-schedule-by-year/2023-2024"))
-                .andExpect(status().isNotFound()) // Expect 404 status
+                .andExpect(status().isNotFound())
                 .andExpect(jsonPath("$.message").value("No Schedules with year: 2023-2024 found."))
                 .andExpect(jsonPath("$.status").value(404))
-                .andExpect(jsonPath("$.error").value("Not Found"));
+                .andExpect(jsonPath("$.error").value("Resource not found"));
     }
 
     @Test

@@ -93,7 +93,7 @@ class GradeControllerTest {
                 .andExpect(status().isNotFound()) // Expect 404 status
                 .andExpect(jsonPath("$.message").value("No Grades found."))
                 .andExpect(jsonPath("$.status").value(404))
-                .andExpect(jsonPath("$.error").value("Not Found"));
+                .andExpect(jsonPath("$.error").value("Resource not found"));
     }
 
     @Test
@@ -126,7 +126,7 @@ class GradeControllerTest {
                 .andExpect(status().isNotFound()) // Expect 404 status
                 .andExpect(jsonPath("$.message").value("No active Grades found."))
                 .andExpect(jsonPath("$.status").value(404))
-                .andExpect(jsonPath("$.error").value("Not Found"));
+                .andExpect(jsonPath("$.error").value("Resource not found"));
     }
 
     @Test
@@ -159,7 +159,7 @@ class GradeControllerTest {
                 .andExpect(status().isNotFound())
                 .andExpect(jsonPath("$.message").value("No Grades with home teacher with id: 1 found."))
                 .andExpect(jsonPath("$.status").value(404))
-                .andExpect(jsonPath("$.error").value("Not Found"));
+                .andExpect(jsonPath("$.error").value("Resource not found"));
     }
 
     @Test

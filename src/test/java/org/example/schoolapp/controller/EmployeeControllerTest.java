@@ -82,7 +82,7 @@ class EmployeeControllerTest {
                 .andExpect(status().isNotFound()) // Expect 404 status
                 .andExpect(jsonPath("$.message").value("No Employees found."))
                 .andExpect(jsonPath("$.status").value(404))
-                .andExpect(jsonPath("$.error").value("Not Found"));
+                .andExpect(jsonPath("$.error").value("Resource not found"));
     }
 
     @Test
@@ -110,7 +110,7 @@ class EmployeeControllerTest {
                 .andExpect(status().isNotFound()) // Expect 404 status
                 .andExpect(jsonPath("$.message").value("No active Employees found."))
                 .andExpect(jsonPath("$.status").value(404))
-                .andExpect(jsonPath("$.error").value("Not Found"));
+                .andExpect(jsonPath("$.error").value("Resource not found"));
     }
 
     @Test
@@ -138,7 +138,7 @@ class EmployeeControllerTest {
                 .andExpect(status().isNotFound()) // Expect 404 status
                 .andExpect(jsonPath("$.message").value("No Employees found with subjectId: 1."))
                 .andExpect(jsonPath("$.status").value(404))
-                .andExpect(jsonPath("$.error").value("Not Found"));
+                .andExpect(jsonPath("$.error").value("Resource not found"));
     }
 
     @Test

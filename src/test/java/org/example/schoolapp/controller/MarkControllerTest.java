@@ -91,7 +91,7 @@ class MarkControllerTest {
                 .andExpect(status().isNotFound())
                 .andExpect(jsonPath("$.message").value("No Marks found."))
                 .andExpect(jsonPath("$.status").value(404))
-                .andExpect(jsonPath("$.error").value("Not Found"));
+                .andExpect(jsonPath("$.error").value("Resource not found"));
     }
 
     @Test
@@ -123,7 +123,7 @@ class MarkControllerTest {
                 .andExpect(status().isNotFound())
                 .andExpect(jsonPath("$.message").value("No Marks with studentId: 1 found."))
                 .andExpect(jsonPath("$.status").value(404))
-                .andExpect(jsonPath("$.error").value("Not Found"));
+                .andExpect(jsonPath("$.error").value("Resource not found"));
     }
 
     @Test
@@ -155,7 +155,7 @@ class MarkControllerTest {
                 .andExpect(status().isNotFound())
                 .andExpect(jsonPath("$.message").value("No Marks with studentId: 1 subjectId: 1, year: 2023 quarter : 1 found."))
                 .andExpect(jsonPath("$.status").value(404))
-                .andExpect(jsonPath("$.error").value("Not Found"));
+                .andExpect(jsonPath("$.error").value("Resource not found"));
     }
 
     @Test
@@ -222,7 +222,7 @@ class MarkControllerTest {
                 .andExpect(status().isNotFound())
                 .andExpect(jsonPath("$.message").value("No Marks with studentId: 1 found."))
                 .andExpect(jsonPath("$.status").value(404))
-                .andExpect(jsonPath("$.error").value("Not Found"));
+                .andExpect(jsonPath("$.error").value("Resource not found"));
     }
 
     @Test
@@ -243,6 +243,6 @@ class MarkControllerTest {
                 .andExpect(status().isNotFound())
                 .andExpect(jsonPath("$.message").value("No Marks with studentId: 1, subjectId: 1 found."))
                 .andExpect(jsonPath("$.status").value(404))
-                .andExpect(jsonPath("$.error").value("Not Found"));
+                .andExpect(jsonPath("$.error").value("Resource not found"));
     }
 }

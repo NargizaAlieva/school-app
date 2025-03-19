@@ -22,7 +22,7 @@ import java.util.List;
 @AllArgsConstructor
 @RestController
 @Tag(name = "Schedule Management", description = "APIs for managing schedules in the system")
-@RequestMapping(value = "ap1/v1/schedule")
+@RequestMapping(value = "api/v1/schedule")
 public class ScheduleController {
     private ScheduleService scheduleService;
 

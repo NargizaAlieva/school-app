@@ -47,7 +47,7 @@ public class SubjectController {
             @ApiResponse(responseCode = "404", description = "Subject not found")
     })
     @GetMapping("/get-subject-by-title/{title}")
-    public ResponseEntity<Response> getSubjectById(
+    public ResponseEntity<Response> getSubjectByTitle(
             @Parameter(description = "Title of the subject to retrieve", required = true)
             @PathVariable String title) {
         SubjectDto subjectDto = subjectService.getByTitle(title);

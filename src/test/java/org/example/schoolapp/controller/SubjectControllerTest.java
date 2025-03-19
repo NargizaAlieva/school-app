@@ -91,10 +91,10 @@ class SubjectControllerTest {
         when(subjectService.getAllSubject()).thenReturn(Collections.emptyList());
 
         mockMvc.perform(get("/ap1/v1/subject/get-all-subject"))
-                .andExpect(status().isNotFound()) // Expect 404 status
+                .andExpect(status().isNotFound())
                 .andExpect(jsonPath("$.message").value("No subjects found."))
                 .andExpect(jsonPath("$.status").value(404))
-                .andExpect(jsonPath("$.error").value("Not Found"));
+                .andExpect(jsonPath("$.error").value("Resource not found"));
     }
 
     @Test
@@ -119,10 +119,10 @@ class SubjectControllerTest {
         when(subjectService.getAllActiveSubject()).thenReturn(Collections.emptyList());
 
         mockMvc.perform(get("/ap1/v1/subject/get-all-active-subject"))
-                .andExpect(status().isNotFound()) // Expect 404 status
+                .andExpect(status().isNotFound())
                 .andExpect(jsonPath("$.message").value("No subjects found."))
                 .andExpect(jsonPath("$.status").value(404))
-                .andExpect(jsonPath("$.error").value("Not Found"));
+                .andExpect(jsonPath("$.error").value("Resource not found"));
     }
 
     @Test

@@ -65,8 +65,9 @@ public class EmployeeMapper {
     private Set<Subject> idToSubject(EmployeeDroRequest employeeDroRequest) {
         Set<Subject> subjectSet = new HashSet<>();
 
-        for (Long s : employeeDroRequest.getSubjectSet())
-            subjectSet.add(subjectService.findByIdEntity(s));
+        if (employeeDroRequest.getSubjectSet() != null)
+            for (Long s : employeeDroRequest.getSubjectSet())
+                subjectSet.add(subjectService.findByIdEntity(s));
 
         return subjectSet;
     }

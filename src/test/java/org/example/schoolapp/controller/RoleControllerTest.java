@@ -77,7 +77,7 @@ class RoleControllerTest {
                 .andExpect(status().isNotFound()) // Expect 404 status
                 .andExpect(jsonPath("$.message").value("No Roles found."))
                 .andExpect(jsonPath("$.status").value(404))
-                .andExpect(jsonPath("$.error").value("Not Found"));
+                .andExpect(jsonPath("$.error").value("Resource not found"));
     }
 
     @Test
