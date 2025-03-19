@@ -29,14 +29,11 @@ public class StudentDtoRequest {
     private String parentStatus;
 
     @NotNull(message = "UserId cannot be null")
-    @NotBlank(message = "UserId cannot be empty")
     private Long userId;
 
     @NotNull(message = "ParentId cannot be null")
-    @NotBlank(message = "ParentId cannot be empty")
     private Long parentId;
 
     @NotNull(message = "GradeId cannot be null")
-    @NotBlank(message = "GradeId cannot be empty")
     private Long gradeId;
 }
