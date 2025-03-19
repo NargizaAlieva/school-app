@@ -1,4 +1,4 @@
-package org.example.schoolapp.validation;
+package org.example.schoolapp.validation.entity;
 
 import org.example.schoolapp.entity.Subject;
 import org.junit.jupiter.api.BeforeEach;
