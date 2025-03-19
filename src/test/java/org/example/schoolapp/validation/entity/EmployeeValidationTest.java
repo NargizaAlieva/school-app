@@ -1,4 +1,4 @@
-package org.example.schoolapp.validation;
+package org.example.schoolapp.validation.entity;
 
 import jakarta.validation.ConstraintViolation;
 import jakarta.validation.Validation;
