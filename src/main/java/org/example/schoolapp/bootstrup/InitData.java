@@ -100,13 +100,31 @@ public class InitData {
                 .title("PRINCIPAL")
                 .build();
 
+        Role role4 = Role.builder()
+                .title("USER")
+                .build();
+
+        Role role5 = Role.builder()
+                .title("PARENT")
+                .build();
+
+        Role role6 = Role.builder()
+                .title("STUDENT")
+                .build();
+
         roleService.save(role1);
         roleService.save(role2);
         roleService.save(role3);
+        roleService.save(role4);
+        roleService.save(role5);
+        roleService.save(role6);
 
         roles.add(role1);
         roles.add(role2);
         roles.add(role3);
+        roles.add(role4);
+        roles.add(role5);
+        roles.add(role6);
     }
 
     private void createSubjects() {
