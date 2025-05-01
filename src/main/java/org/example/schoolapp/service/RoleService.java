@@ -10,6 +10,7 @@ public interface RoleService {
     Role save(Role role);
 
     Role findById(Long id);
+    Role findByTitle(String title);
     RoleDto getDtoById(Long id);
     List<RoleDto> getAllRole();
 

@@ -35,6 +35,12 @@ public class RoleServiceImpl implements RoleService {
     }
 
     @Override
+    public Role findByTitle(String title) {
+        return roleRepository.findByTitle(title)
+                .orElseThrow(() -> new ObjectNotFoundException("Role with title: '" + title + "' not found"));
+    }
+
+    @Override
     public RoleDto getDtoById(Long id) {
         return roleMapper.toRoleDto(findById(id));
     }
