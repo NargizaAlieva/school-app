@@ -76,7 +76,10 @@ public class User implements UserDetails {
             joinColumns = @JoinColumn(name = "user_id"),
             inverseJoinColumns = @JoinColumn(name = "role_id")
     )
-    private Set<Role> roleSet = new HashSet<>();;
+    private Set<Role> roleSet = new HashSet<>();
+
+    @OneToMany(mappedBy = "user")
+    private List<Token> tokens;
 
     @PrePersist
     private void prePersist() {
@@ -92,6 +95,11 @@ public class User implements UserDetails {
         return roleSet.stream()
                 .map(role -> new SimpleGrantedAuthority("ROLE_" + role.getTitle()))
                 .collect(Collectors.toList());
+    }
+
+    @Override
+    public String getUsername() {
+        return getEmail();
     }
 
     @Override
