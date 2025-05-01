@@ -9,7 +9,10 @@ import org.example.schoolapp.dto.request.LoginRequest;
 import org.example.schoolapp.dto.request.RegisterRequest;
 import org.example.schoolapp.dto.response.AuthResponse;
 import org.example.schoolapp.entity.Role;
+import org.example.schoolapp.entity.Token;
 import org.example.schoolapp.entity.User;
+import org.example.schoolapp.enums.TokenType;
+import org.example.schoolapp.repository.TokenRepository;
 import org.example.schoolapp.repository.UserRepository;
 import org.example.schoolapp.service.RoleService;
 import org.springframework.http.HttpHeaders;
@@ -27,6 +30,7 @@ import java.util.Set;
 @RequiredArgsConstructor
 public class AuthService {
     private final UserRepository userRepository;
+    private final TokenRepository tokenRepository;
     private final PasswordEncoder passwordEncoder;
     private final RoleService roleService;
     private final JWTService jwtService;
@@ -50,6 +54,8 @@ public class AuthService {
 
         String accessToken = jwtService.generateToken(user);
 
+        saveUserToken(user, accessToken);
+
         return AuthResponse.builder()
                 .accessToken(accessToken)
                 .build();
@@ -68,8 +74,34 @@ public class AuthService {
 
         String accessToken = jwtService.generateToken(user);
 
+        revokeAllUserTokens(user);
+        saveUserToken(user, accessToken);
+
         return AuthResponse.builder()
                 .accessToken(accessToken)
                 .build();
+    }
+
+    private void revokeAllUserTokens(User user) {
+        var validUserToken = tokenRepository.findAllValidTokensByUser(user.getId());
+        if (validUserToken.isEmpty())
+            return;
+        validUserToken.forEach(token -> {
+            token.setExpired(true);
+            token.setRevoked(true);
+        });
+        tokenRepository.saveAll(validUserToken);
+    }
+
+    private void saveUserToken(User user, String jwtToken) {
+        var token = Token.builder()
+                .user(user)
+                .token(jwtToken)
+                .tokenType(TokenType.Bearer)
+                .revoked(false)
+                .expired(false)
+                .build();
+
+        tokenRepository.save(token);
     }
 }
