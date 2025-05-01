@@ -53,11 +53,13 @@ public class AuthService {
         userRepository.save(user);
 
         String accessToken = jwtService.generateToken(user);
+        String refreshToken = jwtService.generateRefreshToken(user);
 
         saveUserToken(user, accessToken);
 
         return AuthResponse.builder()
                 .accessToken(accessToken)
+                .refreshToken(refreshToken)
                 .build();
     }
 
@@ -73,13 +75,48 @@ public class AuthService {
                 .orElseThrow(() -> new UsernameNotFoundException("User not found"));
 
         String accessToken = jwtService.generateToken(user);
+        String refreshToken = jwtService.generateRefreshToken(user);
 
         revokeAllUserTokens(user);
         saveUserToken(user, accessToken);
 
         return AuthResponse.builder()
                 .accessToken(accessToken)
+                .refreshToken(refreshToken)
                 .build();
+    }
+
+    public void refreshToken(
+            HttpServletRequest request,
+            HttpServletResponse response
+    ) throws IOException {
+        final String authHeader = request.getHeader(HttpHeaders.AUTHORIZATION);
+        final String refreshToken;
+        final String username;
+
+        if (authHeader == null || !authHeader.startsWith("Bearer ")) {
+            return;
+        }
+
+        refreshToken = authHeader.substring(7);
+        username = jwtService.extractUsername(refreshToken);
+
+        if (username != null) {
+            var userDetails = this.userRepository.findByEmail(username)
+                    .orElseThrow(() -> new UsernameNotFoundException("User not found"));
+
+            if (jwtService.isTokenValid(refreshToken, userDetails)) {
+                revokeAllUserTokens(userDetails);
+                var accessToken = jwtService.generateToken(userDetails);
+                saveUserToken(userDetails, accessToken);
+                var authResponse = AuthResponse.builder()
+                        .accessToken(accessToken)
+                        .refreshToken(refreshToken)
+                        .build();
+
+                new ObjectMapper().writeValue(response.getOutputStream(), authResponse);
+            }
+        }
     }
 
     private void revokeAllUserTokens(User user) {

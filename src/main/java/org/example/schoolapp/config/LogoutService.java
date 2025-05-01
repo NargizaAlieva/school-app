@@ -6,13 +6,12 @@ import lombok.RequiredArgsConstructor;
 import org.example.schoolapp.repository.TokenRepository;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.web.authentication.logout.LogoutHandler;
-import org.springframework.stereotype.Repository;
 import org.springframework.stereotype.Service;
 
 @Service
 @RequiredArgsConstructor
 public class LogoutService implements LogoutHandler {
-    private TokenRepository tokenRepository;
+    private final TokenRepository tokenRepository;
 
     @Override
     public void logout(
