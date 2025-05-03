@@ -11,6 +11,7 @@ import org.example.schoolapp.dto.response.AuthResponse;
 import org.example.schoolapp.entity.Role;
 import org.example.schoolapp.entity.Token;
 import org.example.schoolapp.entity.User;
+import org.example.schoolapp.enums.AuthProvider;
 import org.example.schoolapp.enums.TokenType;
 import org.example.schoolapp.repository.TokenRepository;
 import org.example.schoolapp.repository.UserRepository;
@@ -49,13 +50,15 @@ public class AuthService {
                 .phone(request.getPhone() == null ? "" : request.getPhone())
                 .password(passwordEncoder.encode(request.getPassword()))
                 .roleSet(userRole)
+                .provider(AuthProvider.LOCAL)
                 .build();
         userRepository.save(user);
 
         String accessToken = jwtService.generateToken(user);
         String refreshToken = jwtService.generateRefreshToken(user);
 
-        saveUserToken(user, accessToken);
+        saveUserToken(user, accessToken, TokenType.BEARER);
+        saveUserToken(user, refreshToken, TokenType.REFRESH);
 
         return AuthResponse.builder()
                 .accessToken(accessToken)
@@ -64,6 +67,13 @@ public class AuthService {
     }
 
     public AuthResponse login(LoginRequest request) {
+        var user = userRepository.findByEmail(request.getEmail())
+                .orElseThrow(() -> new UsernameNotFoundException("User not found"));
+
+        if (user.getProvider() != AuthProvider.LOCAL) {
+            throw new RuntimeException("Please login using " + user.getProvider().name().toLowerCase());
+        }
+
         authenticationManager.authenticate(
                 new UsernamePasswordAuthenticationToken(
                         request.getEmail(),
@@ -71,14 +81,12 @@ public class AuthService {
                 )
         );
 
-        var user = userRepository.findByEmail(request.getEmail())
-                .orElseThrow(() -> new UsernameNotFoundException("User not found"));
-
         String accessToken = jwtService.generateToken(user);
         String refreshToken = jwtService.generateRefreshToken(user);
 
         revokeAllUserTokens(user);
-        saveUserToken(user, accessToken);
+        saveUserToken(user, accessToken, TokenType.BEARER);
+        saveUserToken(user, refreshToken, TokenType.REFRESH);
 
         return AuthResponse.builder()
                 .accessToken(accessToken)
@@ -108,7 +116,7 @@ public class AuthService {
             if (jwtService.isTokenValid(refreshToken, userDetails)) {
                 revokeAllUserTokens(userDetails);
                 var accessToken = jwtService.generateToken(userDetails);
-                saveUserToken(userDetails, accessToken);
+                saveUserToken(userDetails, accessToken, TokenType.BEARER);
                 var authResponse = AuthResponse.builder()
                         .accessToken(accessToken)
                         .refreshToken(refreshToken)
@@ -119,7 +127,7 @@ public class AuthService {
         }
     }
 
-    private void revokeAllUserTokens(User user) {
+    public void revokeAllUserTokens(User user) {
         var validUserToken = tokenRepository.findAllValidTokensByUser(user.getId());
         if (validUserToken.isEmpty())
             return;
@@ -130,11 +138,11 @@ public class AuthService {
         tokenRepository.saveAll(validUserToken);
     }
 
-    private void saveUserToken(User user, String jwtToken) {
+    public void saveUserToken(User user, String jwtToken, TokenType tokenType) {
         var token = Token.builder()
                 .user(user)
                 .token(jwtToken)
-                .tokenType(TokenType.Bearer)
+                .tokenType(tokenType)
                 .revoked(false)
                 .expired(false)
                 .build();
