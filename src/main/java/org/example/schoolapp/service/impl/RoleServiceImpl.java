@@ -10,6 +10,7 @@ import org.example.schoolapp.util.exception.AlreadyExistException;
 import org.example.schoolapp.util.exception.ObjectNotFoundException;
 import org.example.schoolapp.util.mapper.RoleMapper;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
 import java.util.Set;
@@ -34,6 +35,7 @@ public class RoleServiceImpl implements RoleService {
         return roleRepository.findById(id).orElseThrow(() -> new ObjectNotFoundException("Role with id: '" + id + "' not found"));
     }
 
+    @Transactional(readOnly = true)
     @Override
     public Role findByTitle(String title) {
         return roleRepository.findByTitle(title)

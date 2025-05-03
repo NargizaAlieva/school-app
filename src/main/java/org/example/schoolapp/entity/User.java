@@ -3,6 +3,7 @@ package org.example.schoolapp.entity;
 import jakarta.persistence.*;
 import jakarta.validation.constraints.*;
 import lombok.*;
+import org.example.schoolapp.enums.AuthProvider;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
@@ -39,7 +40,6 @@ public class User implements UserDetails {
     private String firstName;
 
     @NotNull(message = "Last name cannot be null")
-    @NotBlank(message = "Last name cannot be empty")
     @Size(max = 50, message = "Last name must be at most 50 characters")
     @Column(name = "last_name", nullable = false)
     private String lastName;
@@ -53,13 +53,11 @@ public class User implements UserDetails {
     private String phone;
 
     @NotNull(message = "Email name cannot be null")
-    @NotBlank(message = "Email cannot be empty")
     @Email(message = "Invalid email format")
     @Column(name = "email", nullable = false, unique = true)
     private String email;
 
     @NotNull(message = "Password cannot be null")
-    @NotBlank(message = "Password cannot be empty")
     @Size(min = 8, message = "Password must be at least 8 characters long")
     @Column(name = "password", nullable = false)
     private String password;
@@ -69,6 +67,9 @@ public class User implements UserDetails {
 
     @Column(name = "is_active", nullable = false)
     private Boolean isActive;
+
+    @Enumerated(EnumType.STRING)
+    private AuthProvider provider;
 
     @ManyToMany(fetch = FetchType.EAGER, cascade = {CascadeType.PERSIST, CascadeType.MERGE})
     @JoinTable(
@@ -88,6 +89,7 @@ public class User implements UserDetails {
 
         if (isActive == null)
             isActive = true;
+
     }
 
     @Override
