@@ -1,6 +1,5 @@
 package org.example.schoolapp.util.exception;
 
-import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.transaction.TransactionSystemException;
@@ -8,13 +7,11 @@ import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
 
-import jakarta.validation.ConstraintViolation;
 import jakarta.validation.ConstraintViolationException;
 
 import java.time.LocalDateTime;
 import java.util.HashMap;
 import java.util.Map;
-import java.util.Set;
 import java.util.stream.Collectors;
 
 @RestControllerAdvice
@@ -27,6 +24,11 @@ public class GlobalExceptionHandler {
                 .collect(Collectors.joining(", "));
 
         return buildErrorResponse(HttpStatus.BAD_REQUEST, "Validation failed", errorMessage);
+    }
+
+    @ExceptionHandler(VerificationException.class)
+    public ResponseEntity<Map<String, Object>> handleVerificationException(VerificationException ex) {
+        return buildErrorResponse(HttpStatus.BAD_REQUEST, "Registration falure", ex.getMessage());
     }
 
     @ExceptionHandler(ObjectNotFoundException.class)
