@@ -11,14 +11,15 @@ Streamline school operations with a centralized, web-based platform.
 - [Installation and Setup](#installation-and-setup)
   - [Step 1: Clone the Repository](#step-1-clone-the-repository)
   - [Step 2: Set Up the Database](#step-2-set-up-the-database)
-  - [Step 3: Build and Run the Project](#step-3-build-and-run-the-project)
+  - [Step 3: Set Up JWT Authentication](#step-3-set-up-jwt-authentication)
+  - [Step 4: Set Up OAuth2 Login](#step-4-set-up-oauth2-login)
+  - [Step 5: Set Up Email-Based Two-Factor Verification](#step-5-set-up-email-based-two-factor-verification)
+  - [Step 6: Build and Run the Project](#step-6-build-and-run-the-project)
 - [API Documentation](#api-documentation)
 - [Testing the Application](#testing-the-application)
 - [Database Schema](#database-schema)
 - [Future Improvements](#future-improvements)
-- [Contributing](#contributing)
-- [License](#license)
-- [Contact](#contact)
+- [Scalability](#scalability)
 
 ## Features
 The **School Management System (SMS)** offers the following key features:
@@ -34,7 +35,7 @@ The **School Management System (SMS)** offers the following key features:
 - **Subject Management**: Define and manage school subjects.
 
 ## Technologies Used
-- **Backend**: Java Spring Boot
+- **Backend**: Java Spring Boot, JWT Token, Spring Security
 - **Database**: H2 (in-memory) or PostgreSQL (for production)
 - **API Documentation**: Swagger UI & OpenAPI
 - **Frontend**: Web-based interface (compatible with desktop and mobile browsers)
@@ -71,8 +72,46 @@ spring.datasource.url=jdbc:postgresql://localhost:5432/school-app
 spring.datasource.username=postgres
 spring.datasource.password=postgres
 ```
+### Step 3: Set Up JWT Authentication
 
-### Step 3: Build and Run the Project
+1. **Generate a Secret Key**  
+   Use a JWT secret key generator (e.g., [https://www.allkeysgenerator.com](https://www.allkeysgenerator.com)) to generate a base64-encoded secret key.
+
+2. **Create the Database**  
+   Set up a new database named `school_app`.
+
+3. **Update Configuration**  
+   Add the following properties to your `application.properties` file:
+
+   ```properties
+   secret.key=your_base64_encoded_secret_key
+   token.expiration=86400000                  # 1 day in milliseconds
+   refresh-token.expiration=604800000         # 7 days in milliseconds
+   verification-token.expiration=300000       # 5 minutes in milliseconds
+
+### Step 4: Set Up OAuth2 Login
+1. **Register Your App**
+Register your application on each provider’s developer console:
+
+- **Google Developer Console**
+- **GitHub Developer Settings**
+- **Facebook for Developers**
+
+2. **Get Your Credentials**
+Retrieve the Client ID and Client Secret from each platform.
+
+3. **Update Configuration**
+Add the credentials to your application.properties file
+
+### Step 5: Set Up Email-Based Two-Factor Verification
+1. **Generate an App Password**
+For Gmail: Go to https://myaccount.google.com/apppasswords and generate an app password.
+For other providers: Refer to their respective documentation.
+
+2. **Configure Email Settings**
+Add the following to your application.properties
+
+### Step 6: Build and Run the Project
 #### Using Maven
 ```bash
 mvn spring-boot:run
@@ -85,8 +124,8 @@ mvn spring-boot:run
 
 ## API Documentation
 The system provides API documentation using **Swagger UI** and **OpenAPI**.
-- **Swagger UI**: [http://localhost:8080/swagger-ui.html](http://localhost:8080/swagger-ui.html)
-- **OpenAPI JSON**: [http://localhost:8080/v3/api-docs](http://localhost:8080/v3/api-docs)
+- **Swagger UI**: [http://localhost:8888/swagger-ui.html](http://localhost:8888/swagger-ui.html)
+- **OpenAPI JSON**: [http://localhost:8888/v3/api-docs](http://localhost:8888/v3/api-docs)
 
 ## Testing the Application
 - Use **Postman** or any API testing tool to test REST APIs.
@@ -105,14 +144,13 @@ The database schema is structured around **10 core entities**:
 - **Schedules**: Represents the timetable for classes.
 - **Lessons**: Stores individual lessons.
 - **Marks**: Stores student grades for lessons.
+- **Tokens**: Stores user tokens.
 
 For a detailed schema and entity relationships, refer to the **Database Schema** section in the SRS document.
 
 ## Future Improvements
 ### Authorization and Authentication Enhancements
 - Implement **Single Sign-On (SSO)**.
-- Introduce **passwordless authentication** (magic links, device-based authentication).
-- Implement **OAuth 2.0** for secure authentication and authorization.
 
 ### Scalability
 - Enhance **cloud-based deployment** for better scalability.
