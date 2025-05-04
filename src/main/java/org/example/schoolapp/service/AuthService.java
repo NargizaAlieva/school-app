@@ -72,7 +72,7 @@ public class AuthService {
                 )
         );
 
-//        emailService.sendFactorAuthEmail(user);
+        emailService.sendFactorAuthEmail(user);
     }
 
     public void refreshToken(

@@ -10,6 +10,7 @@ import org.example.schoolapp.enums.TokenType;
 import org.example.schoolapp.repository.UserRepository;
 import org.example.schoolapp.service.entity.TokenService;
 import org.example.schoolapp.util.exception.ObjectNotFoundException;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.mail.SimpleMailMessage;
 import org.springframework.mail.javamail.JavaMailSender;
 import org.springframework.stereotype.Service;
@@ -25,22 +26,11 @@ public class EmailService {
     private final JWTService jwtService;
     private final TokenService tokenService;
     private final JavaMailSender mailSender;
-    private String baseUrl= "http://localhost:8888/api/v1/";
 
-//    public void sendFactorAuthEmail(User user) {
-//        String factorAuth = UUID.randomUUID().toString();
-//        tokenService.saveUserToken(user, factorAuth, TokenType.FACTOR_AUTH);
-//        String link = baseUrl + "auth/verify?token=" + factorAuth;
-//
-//        log.info("verificationToken: {}", factorAuth);
-//
-//        SimpleMailMessage message = new SimpleMailMessage();
-//        message.setTo(user.getEmail());
-//        message.setSubject("Your 2FA Verification Code");
-//        message.setText("Please click the following link to verify your email: " + link);
-//
-//        mailSender.send(message);
-//    }
+    @Value("${server.port}")
+    private int serverPort;
+
+    private final String baseUrl= "http://localhost: " + serverPort + "/api/v1/";
 
     public void sendVerificationEmail(String email) {
         User user = userRepository.findByEmail(email)
@@ -54,12 +44,24 @@ public class EmailService {
         tokenService.saveUserToken(user, verificationToken, TokenType.VERIFICATION);
         String link = baseUrl + "auth/verify?token=" + verificationToken;
 
-        log.info("verificationToken: {}", verificationToken);
-
         SimpleMailMessage message = new SimpleMailMessage();
         message.setTo(user.getEmail());
         message.setSubject("Verify your email address");
         message.setText("Please click the following link to verify your email: " + link);
+
+        mailSender.send(message);
+    }
+
+    public void sendFactorAuthEmail(User user) {
+        String factorAuth = UUID.randomUUID().toString();
+        tokenService.saveUserToken(user, factorAuth, TokenType.FACTOR_AUTH);
+        String link = baseUrl + "auth/verify?token=" + factorAuth;
+
+        SimpleMailMessage message = new SimpleMailMessage();
+        message.setTo(user.getEmail());
+        message.setSubject("Your 2FA Verification Code");
+        message.setText("Please click the following link to verify your email: " + link);
+
 
         mailSender.send(message);
     }

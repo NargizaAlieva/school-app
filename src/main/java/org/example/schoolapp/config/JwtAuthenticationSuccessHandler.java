@@ -31,7 +31,7 @@ public class JwtAuthenticationSuccessHandler implements AuthenticationSuccessHan
             throw new VerificationException();
         }
 
-//        emailService.sendFactorAuthEmail(user);
+        emailService.sendFactorAuthEmail(user);
 
         response.setContentType(MediaType.APPLICATION_JSON_VALUE);
         new ObjectMapper().writeValue(response.getWriter(), "Please verify your 2-factor Authentication. We sent you email message");
