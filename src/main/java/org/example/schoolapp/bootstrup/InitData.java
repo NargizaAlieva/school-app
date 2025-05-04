@@ -141,7 +141,7 @@ public class InitData {
 
     private void createSubjects() {
         Subject subject1 = Subject.builder()
-                .title("Mathematics")
+                .title("Maths")
                 .description("This subject covers algebra, calculus, and geometry.")
                 .build();
 

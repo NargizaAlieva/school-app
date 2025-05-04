@@ -27,12 +27,12 @@ public class GlobalExceptionHandler {
     }
 
     @ExceptionHandler(TokenExpiredException.class)
-    public ResponseEntity<Map<String, Object>> handleVerificationException(TokenExpiredException ex) {
+    public ResponseEntity<Map<String, Object>> handleTokenExpiredException(TokenExpiredException ex) {
         return buildErrorResponse(HttpStatus.BAD_REQUEST, "Login falure", ex.getMessage());
     }
 
     @ExceptionHandler(NoTokenProvided.class)
-    public ResponseEntity<Map<String, Object>> handleVerificationException(NoTokenProvided ex) {
+    public ResponseEntity<Map<String, Object>> handleNoTokenException(NoTokenProvided ex) {
         return buildErrorResponse(HttpStatus.BAD_REQUEST, "Login falure", ex.getMessage());
     }
 
