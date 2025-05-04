@@ -99,7 +99,7 @@ public class UserServiceImpl implements UserService {
 
     @Override
     public UserDto createUser(UserDtoRequest userDtoRequest) {
-        if (isEmailExist(userDtoRequest.getEmail()))
+        if (!isEmailExist(userDtoRequest.getEmail()))
             return saveUser(userMapper.toUserEntity(userDtoRequest));
         return null;
     }
@@ -108,9 +108,6 @@ public class UserServiceImpl implements UserService {
     public UserDto updateUser(UserDtoRequest userDtoRequest)  {
         User request = userMapper.toUserEntity(userDtoRequest);
         User user = getEntityById(userDtoRequest.getId());
-
-        if (!user.getUsername().equals(request.getUsername()))
-            isUsernameExist(request.getUsername());
 
         if (!user.getEmail().equals(request.getEmail()))
             isEmailExist(request.getEmail());

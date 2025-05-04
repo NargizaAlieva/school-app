@@ -3,16 +3,14 @@ package org.example.schoolapp.controller;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import lombok.RequiredArgsConstructor;
+import org.example.schoolapp.dto.Response;
 import org.example.schoolapp.dto.request.LoginRequest;
 import org.example.schoolapp.dto.request.RegisterRequest;
-import org.example.schoolapp.dto.response.AuthResponse;
 import org.example.schoolapp.service.AuthService;
+import org.example.schoolapp.service.EmailService;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 import java.io.IOException;
 
@@ -21,23 +19,37 @@ import java.io.IOException;
 @RequiredArgsConstructor
 public class AuthController {
     private final AuthService authService;
+    private final EmailService emailService;
 
     @PostMapping("/register")
     public ResponseEntity<?> register(@RequestBody RegisterRequest request) {
         try {
-            AuthResponse response = authService.register(request);
-            return ResponseEntity.ok(response);
-        } catch (Exception e) {
-            e.printStackTrace();
-            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
-                    .body("Registration failed: " + e.getMessage());
+           authService.register(request);
+            return ResponseEntity.ok("Please verify your email");
+        } catch (Exception exception) {
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(new Response("Registration failed: " + exception.getMessage(), null));
         }
     }
 
     @PostMapping("/login")
-    public ResponseEntity<AuthResponse> login(@RequestBody LoginRequest request) {
-        AuthResponse response = authService.login(request);
-        return ResponseEntity.ok(response);
+    public ResponseEntity<?> login(@RequestBody LoginRequest request) {
+        try {
+            authService.login(request);
+            return ResponseEntity.ok("Please verify your 2 factor authentication email");
+        } catch (Exception e) {
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
+                    .body("Login failed: " + e.getMessage());
+        }
+    }
+
+    @GetMapping("/verify")
+    public void verify(@RequestParam String token, HttpServletResponse response) throws IOException {
+        emailService.verifyTokenAndGenerateTokens(token, response);
+    }
+
+    @GetMapping("/get-verification-token")
+    public void getVerificationToken(@RequestParam String email) throws IOException {
+        emailService.sendVerificationEmail(email);
     }
 
     @PostMapping("/refresh-token")

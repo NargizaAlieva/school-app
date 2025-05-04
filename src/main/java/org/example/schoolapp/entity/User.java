@@ -73,7 +73,7 @@ public class User implements UserDetails {
     @Enumerated(EnumType.STRING)
     private AuthProvider provider;
 
-    @ManyToMany(fetch = FetchType.EAGER, cascade = {CascadeType.PERSIST, CascadeType.MERGE})
+    @ManyToMany(fetch = FetchType.EAGER)
     @JoinTable(
             name = "m2m_users_roles",
             joinColumns = @JoinColumn(name = "user_id"),
@@ -94,6 +94,9 @@ public class User implements UserDetails {
 
         if (isEnabled == null)
             isEnabled = false;
+
+        if(provider == null)
+            provider = AuthProvider.LOCAL;
 
         username = email;
     }

@@ -1,18 +1,16 @@
 package org.example.schoolapp.config;
 
 import io.jsonwebtoken.io.IOException;
-import jakarta.servlet.http.Cookie;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import lombok.RequiredArgsConstructor;
 import org.example.schoolapp.entity.Role;
-import org.example.schoolapp.entity.Token;
 import org.example.schoolapp.entity.User;
 import org.example.schoolapp.enums.AuthProvider;
 import org.example.schoolapp.enums.TokenType;
 import org.example.schoolapp.repository.RoleRepository;
-import org.example.schoolapp.repository.TokenRepository;
 import org.example.schoolapp.repository.UserRepository;
+import org.example.schoolapp.service.entity.TokenService;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.oauth2.client.authentication.OAuth2AuthenticationToken;
@@ -21,7 +19,6 @@ import org.springframework.security.web.authentication.AuthenticationSuccessHand
 import org.springframework.stereotype.Component;
 
 import java.util.HashSet;
-import java.util.List;
 import java.util.UUID;
 
 @Component
@@ -29,7 +26,7 @@ import java.util.UUID;
 public class OAuth2AuthenticationSuccessHandler implements AuthenticationSuccessHandler {
 
     private final JWTService jwtService;
-    private final TokenRepository tokenRepository;
+    private final TokenService tokenService;
     private final UserRepository userRepository;
     private final RoleRepository roleRepository;
     private final PasswordEncoder passwordEncoder;
@@ -47,19 +44,22 @@ public class OAuth2AuthenticationSuccessHandler implements AuthenticationSuccess
         String email = getEmailFromOAuthUser(oauthUser, provider);
         String name = getNameFromOAuthUser(oauthUser, provider);
         String[] nameParts = name != null ? name.split(" ", 2) : new String[]{"", ""};
-        String username = email.contains("@") ? email.substring(0, email.indexOf('@')) : email;
 
         User user = userRepository.findByEmail(email)
-                .orElseGet(() -> createNewUser(email, username, nameParts, provider));
+                .orElseGet(() -> createNewUser(email, nameParts, provider));
 
-        revokeAllUserTokens(user);
+        if (!user.isEnabled()) {
+            throw new RuntimeException("Please first verify your email");
+        }
+
         String accessToken = jwtService.generateToken(user);
         String refreshToken = jwtService.generateRefreshToken(user);
 
-        saveUserToken(user, accessToken, TokenType.BEARER);
-        saveUserToken(user, refreshToken, TokenType.REFRESH);
+        tokenService.revokeAllUserTokens(user);
+        tokenService.saveUserToken(user, accessToken, TokenType.BEARER);
+        tokenService.saveUserToken(user, refreshToken, TokenType.REFRESH);
 
-        setTokenCookies(response, accessToken, refreshToken);
+        tokenService.setTokenCookies(response, jwtService, accessToken, refreshToken);
         sendTokenResponse(response, accessToken, refreshToken);
     }
 
@@ -84,7 +84,7 @@ public class OAuth2AuthenticationSuccessHandler implements AuthenticationSuccess
         return name;
     }
 
-    private User createNewUser(String email, String username, String[] nameParts, AuthProvider provider) {
+    private User createNewUser(String email, String[] nameParts, AuthProvider provider) {
         randomPassword = UUID.randomUUID().toString();
         User newUser = User.builder()
                 .email(email)
@@ -92,28 +92,13 @@ public class OAuth2AuthenticationSuccessHandler implements AuthenticationSuccess
                 .lastName(nameParts.length > 1 ? nameParts[1] : "")
                 .provider(provider)
                 .password(passwordEncoder.encode(randomPassword))
+                .isEnabled(true)
                 .roleSet(new HashSet<>())
                 .build();
         newUser = userRepository.save(newUser);
         Role role = roleRepository.findByTitle("USER").orElseThrow();
         newUser.getRoleSet().add(role);
         return newUser;
-    }
-
-    private void setTokenCookies(HttpServletResponse response, String accessToken, String refreshToken) {
-        Cookie accessTokenCookie = new Cookie("accessToken", accessToken);
-        accessTokenCookie.setHttpOnly(true);
-        accessTokenCookie.setSecure(true);
-        accessTokenCookie.setPath("/");
-        accessTokenCookie.setMaxAge((int) jwtService.getJwtExpiration());
-        response.addCookie(accessTokenCookie);
-
-        Cookie refreshTokenCookie = new Cookie("refreshToken", refreshToken);
-        refreshTokenCookie.setHttpOnly(true);
-        refreshTokenCookie.setSecure(true);
-        refreshTokenCookie.setPath("/");
-        refreshTokenCookie.setMaxAge((int) jwtService.getRefreshExpiration());
-        response.addCookie(refreshTokenCookie);
     }
 
     private void sendTokenResponse(HttpServletResponse response, String accessToken, String refreshToken)
@@ -126,27 +111,5 @@ public class OAuth2AuthenticationSuccessHandler implements AuthenticationSuccess
                 refreshToken,
                 randomPassword
         ));
-    }
-
-    private void revokeAllUserTokens(User user) {
-        List<Token> validTokens = tokenRepository.findAllValidTokensByUser(user.getId());
-        if (!validTokens.isEmpty()) {
-            validTokens.forEach(token -> {
-                token.setExpired(true);
-                token.setRevoked(true);
-            });
-            tokenRepository.saveAll(validTokens);
-        }
-    }
-
-    private void saveUserToken(User user, String jwtToken, TokenType tokenType) {
-        Token token = Token.builder()
-                .user(user)
-                .token(jwtToken)
-                .tokenType(tokenType)
-                .revoked(false)
-                .expired(false)
-                .build();
-        tokenRepository.save(token);
     }
 }

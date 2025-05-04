@@ -26,6 +26,8 @@ public class SecurityConfig {
     private final LogoutHandler logoutHandler;
     private final OAuth2AuthenticationSuccessHandler oAuth2AuthenticationSuccessHandler;
     private final JwtAuthenticationSuccessHandler jwtAuthenticationSuccessHandler;
+    private final CustomAccessDeniedHandler customAccessDeniedHandler;
+    private final CustomAuthenticationEntryPoint customAuthenticationEntryPoint;
 
     @Bean
     public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
@@ -38,22 +40,20 @@ public class SecurityConfig {
                     corsConfiguration.setAllowCredentials(true);
                     return corsConfiguration;
                 }))
-                // Настройка доступа к конечным точкам
+                .exceptionHandling(exception -> exception
+                        .authenticationEntryPoint(customAuthenticationEntryPoint)
+                        .accessDeniedHandler(customAccessDeniedHandler)
+                )
                 .authorizeHttpRequests(request -> request
-                        .requestMatchers("/v3/api-docs/**", "/swagger-ui/**", "/swagger-ui.html", "/h2/**", "/h2-console/**").permitAll()
-                        // Можно указать конкретный путь, * - 1 уровень вложенности, ** - любое количество уровней вложенности
+                        .requestMatchers("/v3/api-docs/**", "/swagger-ui/**", "/swagger-ui.html").permitAll()
                         .requestMatchers("/api/v1/auth/**", "/email/**", "/oauth2/**").permitAll()
-//                        .requestMatchers("/tasks/**").authenticated()
-//                        .requestMatchers("/admin/**").hasRole("ADMIN")
-//                        .requestMatchers("/class-represent/**").hasRole("CLASS_REPRESENTATIVE")
-//                        .requestMatchers("/class-teacher/**").hasRole("CLASS_TEACHER")
-//                        .requestMatchers("/dean/**").hasRole("DEAN")
-//                        .requestMatchers("/parent/**").hasRole("PARENT")
-//                        .requestMatchers("/principle/**").hasRole("PRINCIPAL")
-//                        .requestMatchers("/secretary/**").hasRole("SECRETARY")
-//                        .requestMatchers("/student/**").hasRole("STUDENT")
-//                        .requestMatchers("/teacher/**").hasRole("TEACHER")
-//                        .requestMatchers("/user/**").hasRole("USER")
+                        .requestMatchers("api/v1/admin/**").authenticated()
+//                        .requestMatchers("api/v1/admin/**").hasRole("ADMIN")
+                        .requestMatchers("api/v1/class-teacher/**").hasRole("CLASS_TEACHER")
+                        .requestMatchers("api/v1/parent/**").hasRole("PARENT")
+                        .requestMatchers("api/v1/principle/**").hasRole("PRINCIPAL")
+                        .requestMatchers("api/v1/student/**").hasRole("STUDENT")
+                        .requestMatchers("api/v1/teacher/**").hasRole("TEACHER")
                         .anyRequest().authenticated())
                 .sessionManagement(manager -> manager.sessionCreationPolicy(STATELESS))
                 .authenticationProvider(authenticationProvider)

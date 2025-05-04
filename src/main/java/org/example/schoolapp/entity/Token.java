@@ -4,6 +4,8 @@ import jakarta.persistence.*;
 import lombok.*;
 import org.example.schoolapp.enums.TokenType;
 
+import java.util.Date;
+
 @Entity
 @Table(name = "tokens")
 @Builder(toBuilder = true)
@@ -22,6 +24,12 @@ public class Token {
     @Enumerated(EnumType.STRING)
     @Column(name = "token_type")
     private TokenType tokenType;
+
+    @Column(name = "created_at")
+    private Date createdAt;
+
+    @Column(name = "expires_at")
+    private Date expiresAt;
 
     @Column(name = "is_expired")
     private boolean expired;

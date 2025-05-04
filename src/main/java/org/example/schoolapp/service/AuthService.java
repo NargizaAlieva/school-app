@@ -9,13 +9,12 @@ import org.example.schoolapp.dto.request.LoginRequest;
 import org.example.schoolapp.dto.request.RegisterRequest;
 import org.example.schoolapp.dto.response.AuthResponse;
 import org.example.schoolapp.entity.Role;
-import org.example.schoolapp.entity.Token;
 import org.example.schoolapp.entity.User;
 import org.example.schoolapp.enums.AuthProvider;
 import org.example.schoolapp.enums.TokenType;
-import org.example.schoolapp.repository.TokenRepository;
 import org.example.schoolapp.repository.UserRepository;
 import org.example.schoolapp.service.entity.RoleService;
+import org.example.schoolapp.service.entity.TokenService;
 import org.springframework.http.HttpHeaders;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
@@ -31,13 +30,14 @@ import java.util.Set;
 @RequiredArgsConstructor
 public class AuthService {
     private final UserRepository userRepository;
-    private final TokenRepository tokenRepository;
+    private final TokenService tokenService;
     private final PasswordEncoder passwordEncoder;
     private final RoleService roleService;
     private final JWTService jwtService;
     private final AuthenticationManager authenticationManager;
+    private final EmailService emailService;
 
-    public AuthResponse register(RegisterRequest request) {
+    public void register(RegisterRequest request) {
         Set<Role> userRole = new HashSet<>();
         userRole.add(roleService.findByTitle("USER"));
 
@@ -49,28 +49,20 @@ public class AuthService {
                 .phone(request.getPhone() == null ? "" : request.getPhone())
                 .password(passwordEncoder.encode(request.getPassword()))
                 .roleSet(userRole)
+                .isEnabled(false)
                 .provider(AuthProvider.LOCAL)
                 .build();
         userRepository.save(user);
 
-        String accessToken = jwtService.generateToken(user);
-        String refreshToken = jwtService.generateRefreshToken(user);
-
-        saveUserToken(user, accessToken, TokenType.BEARER);
-        saveUserToken(user, refreshToken, TokenType.REFRESH);
-
-        return AuthResponse.builder()
-                .accessToken(accessToken)
-                .refreshToken(refreshToken)
-                .build();
+        emailService.sendVerificationEmail(user);
     }
 
-    public AuthResponse login(LoginRequest request) {
+    public void login(LoginRequest request) {
         var user = userRepository.findByEmail(request.getEmail())
                 .orElseThrow(() -> new UsernameNotFoundException("User not found"));
 
-        if (user.getProvider() != AuthProvider.LOCAL) {
-            throw new RuntimeException("Please login using " + user.getProvider().name().toLowerCase());
+        if (user.isEnabled()) {
+            throw new RuntimeException("Please first verify your email");
         }
 
         authenticationManager.authenticate(
@@ -80,17 +72,7 @@ public class AuthService {
                 )
         );
 
-        String accessToken = jwtService.generateToken(user);
-        String refreshToken = jwtService.generateRefreshToken(user);
-
-        revokeAllUserTokens(user);
-        saveUserToken(user, accessToken, TokenType.BEARER);
-        saveUserToken(user, refreshToken, TokenType.REFRESH);
-
-        return AuthResponse.builder()
-                .accessToken(accessToken)
-                .refreshToken(refreshToken)
-                .build();
+//        emailService.sendFactorAuthEmail(user);
     }
 
     public void refreshToken(
@@ -113,9 +95,9 @@ public class AuthService {
                     .orElseThrow(() -> new UsernameNotFoundException("User not found"));
 
             if (jwtService.isTokenValid(refreshToken, userDetails)) {
-                revokeAllUserTokens(userDetails);
+                tokenService.revokeAllUserTokens(userDetails);
                 var accessToken = jwtService.generateToken(userDetails);
-                saveUserToken(userDetails, accessToken, TokenType.BEARER);
+                tokenService.saveUserToken(userDetails, accessToken, TokenType.BEARER);
                 var authResponse = AuthResponse.builder()
                         .accessToken(accessToken)
                         .refreshToken(refreshToken)
@@ -124,28 +106,5 @@ public class AuthService {
                 new ObjectMapper().writeValue(response.getOutputStream(), authResponse);
             }
         }
-    }
-
-    public void revokeAllUserTokens(User user) {
-        var validUserToken = tokenRepository.findAllValidTokensByUser(user.getId());
-        if (validUserToken.isEmpty())
-            return;
-        validUserToken.forEach(token -> {
-            token.setExpired(true);
-            token.setRevoked(true);
-        });
-        tokenRepository.saveAll(validUserToken);
-    }
-
-    public void saveUserToken(User user, String jwtToken, TokenType tokenType) {
-        var token = Token.builder()
-                .user(user)
-                .token(jwtToken)
-                .tokenType(tokenType)
-                .revoked(false)
-                .expired(false)
-                .build();
-
-        tokenRepository.save(token);
     }
 }

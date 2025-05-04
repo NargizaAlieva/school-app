@@ -4,9 +4,11 @@ import jakarta.annotation.PostConstruct;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.example.schoolapp.entity.*;
+import org.example.schoolapp.enums.AuthProvider;
 import org.example.schoolapp.enums.DaysOfWeek;
 import org.example.schoolapp.enums.ParentStatus;
 import org.example.schoolapp.service.entity.*;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Component;
 
 import java.util.*;
@@ -25,6 +27,7 @@ public class InitData {
     private final ScheduleService scheduleService;
     private final LessonService lessonService;
     private final MarkService markService;
+    private final PasswordEncoder passwordEncoder;
 
     List<Subject> subjects = new ArrayList<>();
     List<Role> roles = new ArrayList<>();
@@ -58,7 +61,9 @@ public class InitData {
                 .middleName("Robert")
                 .phone("+1122334455")
                 .email("alex@example.com")
-                .password("strongPassword789")
+                .password(passwordEncoder.encode("strongPassword789"))
+                .isEnabled(true)
+                .provider(AuthProvider.LOCAL)
                 .build();
 
         User user2 = User.builder()
@@ -67,7 +72,9 @@ public class InitData {
                 .middleName("Grace")
                 .phone("+1444555666")
                 .email("emily.williams@example.com")
-                .password("EmilySecure789")
+                .password(passwordEncoder.encode("EmilySecure789"))
+                .isEnabled(true)
+                .provider(AuthProvider.LOCAL)
                 .build();
 
         User user3 = User.builder()
@@ -76,7 +83,9 @@ public class InitData {
                 .middleName("Edward")
                 .phone("+1555666777")
                 .email("daniel.brown@example.com")
-                .password("DBrownPass321")
+                .password(passwordEncoder.encode("DBrownPass321"))
+                .isEnabled(true)
+                .provider(AuthProvider.LOCAL)
                 .build();
 
         userService.save(user1);
@@ -86,7 +95,7 @@ public class InitData {
 
     private void createRoles() {
         Role role1 = Role.builder()
-                .title("CLASS_TEACHER")
+                .title("PRINCIPAL")
                 .build();
 
         Role role2 = Role.builder()
@@ -94,7 +103,7 @@ public class InitData {
                 .build();
 
         Role role3 = Role.builder()
-                .title("PRINCIPAL")
+                .title("CLASS_TEACHER")
                 .build();
 
         Role role4 = Role.builder()
@@ -109,12 +118,17 @@ public class InitData {
                 .title("STUDENT")
                 .build();
 
+        Role role7 = Role.builder()
+                .title("TEACHER")
+                .build();
+
         roleService.save(role1);
         roleService.save(role2);
         roleService.save(role3);
         roleService.save(role4);
         roleService.save(role5);
         roleService.save(role6);
+        roleService.save(role7);
 
         roles.add(role1);
         roles.add(role2);
@@ -122,6 +136,7 @@ public class InitData {
         roles.add(role4);
         roles.add(role5);
         roles.add(role6);
+        roles.add(role7);
     }
 
     private void createSubjects() {
@@ -150,13 +165,20 @@ public class InitData {
     }
 
     private void createEmployees() {
+        Set<Role> roleset = new HashSet<>();
+        roleset.add(roles.get(6));
+        roleset.add(roles.get(2));
+
         User user1 = User.builder()
                 .firstName("John")
                 .lastName("Doe")
                 .middleName("Michael")
                 .phone("+1234567890")
                 .email("john@example.com")
-                .password("password123")
+                .password(passwordEncoder.encode("password123"))
+                .isEnabled(true)
+                .provider(AuthProvider.LOCAL)
+                .roleSet(roleset)
                 .build();
 
         User user2 = User.builder()
@@ -165,7 +187,38 @@ public class InitData {
                 .middleName("Elizabeth")
                 .phone("+9876543210")
                 .email("jane@example.com")
-                .password("securePass456")
+                .password(passwordEncoder.encode("securePass456"))
+                .isEnabled(true)
+                .provider(AuthProvider.LOCAL)
+                .roleSet(roleset)
+                .build();
+
+        roleset = new HashSet<>();
+        roleset.add(roles.get(1));
+        User user3 = User.builder()
+                .firstName("John")
+                .lastName("Doe")
+                .middleName("Michael")
+                .phone("+1234567890")
+                .email("jonatan@example.com")
+                .password(passwordEncoder.encode("password123"))
+                .isEnabled(true)
+                .provider(AuthProvider.LOCAL)
+                .roleSet(roleset)
+                .build();
+
+        roleset = new HashSet<>();
+        roleset.add(roles.get(0));
+        User user4 = User.builder()
+                .firstName("John")
+                .lastName("Doe")
+                .middleName("Michael")
+                .phone("+1234567890")
+                .email("jenny@example.com")
+                .password(passwordEncoder.encode("securePass456"))
+                .isEnabled(true)
+                .provider(AuthProvider.LOCAL)
+                .roleSet(roleset)
                 .build();
 
         Set<Subject> subjectsFor1 = new HashSet<>();
@@ -189,11 +242,29 @@ public class InitData {
                 .subjectSet(subjectsFor2)
                 .build();
 
+        Employee employee3 = Employee.builder()
+                .position("Principal")
+                .salary(100000)
+                .user(user4)
+                .build();
+
+        Employee employee4 = Employee.builder()
+                .position("Admin")
+                .salary(80000)
+                .user(user3)
+                .build();
+
         employeeService.save(employee1);
         employees.add(employee1);
 
         employeeService.save(employee2);
         employees.add(employee2);
+
+        employeeService.save(employee3);
+        employees.add(employee3);
+
+        employeeService.save(employee4);
+        employees.add(employee4);
     }
 
     private void createGrades() {
@@ -223,13 +294,19 @@ public class InitData {
     }
 
     private void createParents() {
+        Set<Role> roleset = new HashSet<>();
+        roleset.add(roles.get(4));
+
         User user1 = User.builder()
                 .firstName("Emily")
                 .lastName("Williams")
                 .middleName("Anne")
                 .phone("+1987654321")
                 .email("melly@example.com")
-                .password("securePass456")
+                .password(passwordEncoder.encode("securePass456"))
+                .isEnabled(true)
+                .provider(AuthProvider.LOCAL)
+                .roleSet(roleset)
                 .build();
 
         User user2 = User.builder()
@@ -238,7 +315,10 @@ public class InitData {
                 .middleName("James")
                 .phone("+1765432109")
                 .email("eric@example.com")
-                .password("strongPass789")
+                .password(passwordEncoder.encode("strongPass789"))
+                .isEnabled(true)
+                .provider(AuthProvider.LOCAL)
+                .roleSet(roleset)
                 .build();
 
         Parent parent1 = Parent.builder()
@@ -257,13 +337,19 @@ public class InitData {
     }
 
     private void createStudents() {
+        Set<Role> roleset = new HashSet<>();
+        roleset.add(roles.get(5));
+
         User user1 = User.builder()
                 .firstName("Sarah")
                 .lastName("Miller")
                 .middleName("Elizabeth")
                 .phone("+1654321098")
                 .email("sarah@example.com")
-                .password("myPassword321")
+                .password(passwordEncoder.encode("myPassword321"))
+                .isEnabled(true)
+                .provider(AuthProvider.LOCAL)
+                .roleSet(roleset)
                 .build();
 
         User user2 = User.builder()
@@ -272,7 +358,10 @@ public class InitData {
                 .middleName("William")
                 .phone("+1543210987")
                 .email("michael@example.com")
-                .password("pass987654")
+                .password(passwordEncoder.encode("pass987654"))
+                .isEnabled(true)
+                .provider(AuthProvider.LOCAL)
+                .roleSet(roleset)
                 .build();
 
         User user3 = User.builder()
@@ -281,7 +370,10 @@ public class InitData {
                 .middleName("William")
                 .phone("+1543090987")
                 .email("niko@example.com")
-                .password("pass987654")
+                .password(passwordEncoder.encode("pass987654"))
+                .isEnabled(true)
+                .provider(AuthProvider.LOCAL)
+                .roleSet(roleset)
                 .build();
 
         Student student1 = Student.builder()

@@ -27,6 +27,9 @@ public class JWTService {
     @Value("${token.expiration}")
     private long jwtExpiration;
 
+    @Value("${verification-token.expiration}")
+    private long verificationExpiration;
+
     @Value("${refresh-token.expiration}")
     private long refreshExpiration;
 
