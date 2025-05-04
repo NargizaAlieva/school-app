@@ -10,6 +10,7 @@ import org.springframework.security.core.userdetails.UserDetails;
 
 import java.time.LocalDateTime;
 import java.util.Collection;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 import java.util.stream.Collectors;
@@ -79,7 +80,7 @@ public class User implements UserDetails {
             joinColumns = @JoinColumn(name = "user_id"),
             inverseJoinColumns = @JoinColumn(name = "role_id")
     )
-    private Set<Role> roleSet;
+    private Set<Role> roleSet = new HashSet<>();
 
     @OneToMany(mappedBy = "user")
     private List<Token> tokens;
@@ -89,8 +90,14 @@ public class User implements UserDetails {
         if (creationDate == null)
             creationDate = LocalDateTime.now();
 
+        if (roleSet == null)
+            roleSet = new HashSet<>();
+
         if (isActive == null)
             isActive = true;
+
+        if (isEnabled == null)
+            isEnabled = false;
 
         if(provider == null)
             provider = AuthProvider.LOCAL;
