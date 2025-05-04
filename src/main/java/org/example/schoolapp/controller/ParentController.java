@@ -1,132 +1,98 @@
 package org.example.schoolapp.controller;
 
 import io.swagger.v3.oas.annotations.Operation;
-import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.media.Content;
 import io.swagger.v3.oas.annotations.media.Schema;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.AllArgsConstructor;
+
 import org.example.schoolapp.dto.Response;
-import org.example.schoolapp.dto.request.ParentDtoRequest;
-import org.example.schoolapp.dto.response.ParentDto;
-import org.example.schoolapp.service.ParentService;
-import org.example.schoolapp.util.exception.ObjectNotFoundException;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
-import java.util.List;
+import org.example.schoolapp.dto.request.*;
+import org.example.schoolapp.dto.response.*;
+import org.example.schoolapp.service.role.ParentRoleService;
 
-@AllArgsConstructor
 @RestController
-@Tag(name = "Parent Management", description = "APIs for managing parents in the system")
-@RequestMapping(value = "ap1/v1/parent")
+@RequestMapping(value = "/api/v1/parent")
+@AllArgsConstructor
+@Tag(name = "Parent Management", description = "Operations related to parent role.")
 public class ParentController {
-    private final ParentService parentService;
+    private final ParentRoleService parentRoleService;
 
-    @Operation(summary = "Get parent by ID", description = "Retrieves a parent by their unique ID")
+    @Operation(summary = "Create a new student",
+            description = "Creates a new student based on the provided student details.")
     @ApiResponses(value = {
-            @ApiResponse(responseCode = "200", description = "Parent found",
+            @ApiResponse(responseCode = "201", description = "Successfully created Student.", content = @Content(schema = @Schema(implementation = Response.class))),
+            @ApiResponse(responseCode = "400", description = "Student is not saved due to validation errors.", content = @Content)
+    })
+    @PostMapping(value = "/create-student")
+    public ResponseEntity<Response> createStudent(@RequestBody StudentDtoRequest request) {
+        try {
+            StudentDto studentDto = parentRoleService.createStudent(request);
+            return ResponseEntity.status(HttpStatus.CREATED).body(new Response("Successfully created Student.", studentDto));
+        } catch (Exception exception) {
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(new Response("Student is not saved. " + exception.getMessage(), null));
+        }
+    }
+
+    @Operation(summary = "Get all children",
+            description = "Retrieves a list of all children associated with the parent.")
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200", description = "Successfully got all children.", content = @Content(schema = @Schema(implementation = Response.class))),
+            @ApiResponse(responseCode = "404", description = "Children not found.", content = @Content)
+    })
+    @GetMapping("/get-all-child")
+    public ResponseEntity<Response> getChildList() {
+        try {
+            return ResponseEntity.ok(new Response("Successfully got all children.", parentRoleService.getChildList()));
+        } catch (Exception exception) {
+            return ResponseEntity.status(HttpStatus.NOT_FOUND).body(new Response("Children not found. " + exception.getMessage(), null));
+        }
+    }
+
+    @Operation(
+            summary = "Get student's schedule",
+            description = "Retrieves the schedule for a specific child. " +
+                    "This endpoint allows parents to check their child's daily or weekly schedule."
+    )
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200", description = "Successfully retrieved student's schedule.",
                     content = @Content(schema = @Schema(implementation = Response.class))),
-            @ApiResponse(responseCode = "404", description = "Parent not found")
+            @ApiResponse(responseCode = "404", description = "Schedule not found for the specified child.",
+                    content = @Content)
     })
-    @GetMapping("/get-parent-by-id/{parentId}")
-    public ResponseEntity<Response> getParentById(
-            @Parameter(description = "ID of the parent to retrieve", required = true)
-            @PathVariable Long parentId) {
-        ParentDto parentDto = parentService.getDtoById(parentId);
-        return ResponseEntity.ok(new Response("Successfully retrieved Parent with Id: " + parentId, parentDto));
+    @GetMapping("/get-student-schedule/{childId}")
+    public ResponseEntity<Response> getStudentSchedule(@PathVariable Long childId) {
+        try {
+            return ResponseEntity.ok(new Response("Successfully got Schedules.", parentRoleService.getStudentSchedule(childId)));
+        } catch (Exception exception) {
+            return ResponseEntity.status(HttpStatus.NOT_FOUND).body(new Response("Couldn't find. " + exception.getMessage(), null));
+        }
     }
 
-    @Operation(summary = "Get all parents", description = "Retrieves a list of all parents in the system")
+    @Operation(
+            summary = "Delete a student by ID",
+            description = "Deletes a specific student from the school by their ID. " +
+                    "This endpoint is used to remove a student from the system."
+    )
     @ApiResponses(value = {
-            @ApiResponse(responseCode = "200", description = "Parents found",
-                    content = @Content(schema = @Schema(implementation = Response.class))),
-            @ApiResponse(responseCode = "404", description = "No parents found")
+            @ApiResponse(responseCode = "200", description = "Successfully deleted the student.",
+                    content = @Content),
+            @ApiResponse(responseCode = "404", description = "Student not found for the specified ID.",
+                    content = @Content)
     })
-    @GetMapping("/get-all-parent")
-    public ResponseEntity<Response> getAllParent() {
-        List<ParentDto> parents = parentService.getAllParent();
-
-        if (parents.isEmpty())
-            throw new ObjectNotFoundException("No Parent found.");
-
-        return ResponseEntity.ok(new Response("Successfully retrieved all Parents.", parents));
-    }
-
-    @Operation(summary = "Get all active parents", description = "Retrieves a list of all active parents in the system")
-    @ApiResponses(value = {
-            @ApiResponse(responseCode = "200", description = "Active parents found",
-                    content = @Content(schema = @Schema(implementation = Response.class))),
-            @ApiResponse(responseCode = "404", description = "No active parents found")
-    })
-    @GetMapping("/get-all-active-parent")
-    public ResponseEntity<Response> getAllActiveParent() {
-        List<ParentDto> parents = parentService.getAllActiveParent();
-
-        if (parents.isEmpty())
-            throw new ObjectNotFoundException("No active Parent found.");
-
-        return ResponseEntity.ok(new Response("Successfully retrieved all active Parents.", parents));
-    }
-
-    @Operation(summary = "Create a new parent", description = "Creates a new parent in the system")
-    @ApiResponses(value = {
-            @ApiResponse(responseCode = "201", description = "Parent created",
-                    content = @Content(schema = @Schema(implementation = Response.class)))
-    })
-    @PostMapping(value = "/create-parent")
-    public ResponseEntity<Response> createParent(
-            @io.swagger.v3.oas.annotations.parameters.RequestBody(
-                    description = "Parent details to create", required = true,
-                    content = @Content(schema = @Schema(implementation = ParentDtoRequest.class)))
-            @RequestBody ParentDtoRequest request
-    ) {
-        ParentDto parentDto = parentService.createParent(request);
-        return ResponseEntity.status(HttpStatus.CREATED).body(new Response("Successfully created Parent.", parentDto));
-    }
-
-    @Operation(summary = "Update a parent", description = "Updates an existing parent in the system")
-    @ApiResponses(value = {
-            @ApiResponse(responseCode = "200", description = "Parent updated",
-                    content = @Content(schema = @Schema(implementation = Response.class)))
-    })
-    @PutMapping(value = "/update-parent")
-    public ResponseEntity<Response> updateParent(
-            @io.swagger.v3.oas.annotations.parameters.RequestBody(
-                    description = "Parent details to update", required = true,
-                    content = @Content(schema = @Schema(implementation = ParentDtoRequest.class)))
-            @RequestBody ParentDtoRequest request
-    ) {
-        ParentDto parentDto = parentService.updateParent(request);
-        return ResponseEntity.ok(new Response("Successfully updated Parent with id: " + request.getId(), parentDto));
-    }
-
-    @Operation(summary = "Delete a parent", description = "Deletes a parent from the system")
-    @ApiResponses(value = {
-            @ApiResponse(responseCode = "200", description = "Parent deleted",
-                    content = @Content(schema = @Schema(implementation = Response.class)))
-    })
-    @DeleteMapping(value = "/delete-parent/{parentId}")
-    public ResponseEntity<Response> deleteParent(
-            @Parameter(description = "ID of the parent to delete", required = true)
-            @PathVariable Long parentId) {
-        parentService.deleteParent(parentId);
-        return ResponseEntity.ok(new Response("Successfully deleted Parent with id: " + parentId, null));
-    }
-
-    @Operation(summary = "Restore a parent", description = "Restores a previously deleted parent")
-    @ApiResponses(value = {
-            @ApiResponse(responseCode = "200", description = "Parent restored",
-                    content = @Content(schema = @Schema(implementation = Response.class)))
-    })
-    @PutMapping(value = "/restore-parent/{parentId}")
-    public ResponseEntity<Response> restoreParent(
-            @Parameter(description = "ID of the parent to restore", required = true)
-            @PathVariable Long parentId) {
-        ParentDto parentDto = parentService.restoreParent(parentId);
-        return ResponseEntity.ok(new Response("Successfully restored Parent with id: " + parentId, parentDto));
+    @DeleteMapping(value = "/delete-user/{childId}")
+    public ResponseEntity<String> deleteUser(@PathVariable Long childId) {
+        try {
+            parentRoleService.leaveSchool(childId);
+            return ResponseEntity.ok("Deleted Student successfully.");
+        } catch (Exception exception) {
+            return ResponseEntity.status(HttpStatus.NOT_FOUND).body("Failed to delete. " + exception.getMessage());
+        }
     }
 }

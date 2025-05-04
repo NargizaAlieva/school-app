@@ -1,178 +1,120 @@
 package org.example.schoolapp.controller;
 
-import org.example.schoolapp.dto.request.ParentDtoRequest;
-import org.example.schoolapp.dto.response.ParentDto;
-import org.example.schoolapp.dto.response.UserDto;
-import org.example.schoolapp.service.ParentService;
-import org.example.schoolapp.util.exception.GlobalExceptionHandler;
+import org.example.schoolapp.dto.Response;
+import org.example.schoolapp.dto.request.StudentDtoRequest;
+import org.example.schoolapp.dto.response.StudentDto;
+import org.example.schoolapp.entity.User;
+import org.example.schoolapp.service.entity.EmployeeService;
+import org.example.schoolapp.service.entity.GradeService;
+import org.example.schoolapp.service.entity.UserService;
+import org.example.schoolapp.service.role.ParentRoleService;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
-import org.mockito.MockitoAnnotations;
-import org.springframework.http.MediaType;
-import org.springframework.test.web.servlet.MockMvc;
-import org.springframework.test.web.servlet.setup.MockMvcBuilders;
+import org.mockito.junit.jupiter.MockitoExtension;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
 
 import java.util.Collections;
 import java.util.List;
+import java.util.Map;
 
+import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.ArgumentMatchers.anyLong;
-import static org.mockito.Mockito.when;
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
-import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
+import static org.mockito.Mockito.*;
 
+@ExtendWith(MockitoExtension.class)
 class ParentControllerTest {
 
-    private MockMvc mockMvc;
-
     @Mock
-    private ParentService parentService;
+    private ParentRoleService parentRoleService;
+    private UserService userService;
+    private EmployeeService employeeService;
+    private GradeService gradeService;
 
     @InjectMocks
     private ParentController parentController;
 
+    private StudentDtoRequest studentRequest;
+    private StudentDto studentDto;
+
     @BeforeEach
     void setUp() {
-        MockitoAnnotations.openMocks(this);
-        mockMvc = MockMvcBuilders.standaloneSetup(parentController)
-                .setControllerAdvice(new GlobalExceptionHandler())
-                .build();
+        studentRequest = new StudentDtoRequest();
+
+        studentDto = new StudentDto();
+        studentDto.setId(1L);
     }
 
     @Test
-    void getParentById() throws Exception {
-        ParentDto parentDto = new ParentDto();
-        parentDto.setId(1L);
-        parentDto.setUser(new UserDto());
-        parentDto.setChildrenNameList(List.of("Child1", "Child2"));
+    void createStudent_Success() {
+        when(parentRoleService.createStudent(any(StudentDtoRequest.class))).thenReturn(studentDto);
 
-        when(parentService.getDtoById(anyLong())).thenReturn(parentDto);
+        ResponseEntity<Response> response = parentController.createStudent(studentRequest);
 
-        mockMvc.perform(get("/ap1/v1/parent/get-parent-by-id/1"))
-                .andExpect(status().isOk())
-                .andExpect(jsonPath("$.message").value("Successfully retrieved Parent with Id: 1"))
-                .andExpect(jsonPath("$.data.id").value(1L))
-                .andExpect(jsonPath("$.data.childrenNameList[0]").value("Child1"))
-                .andExpect(jsonPath("$.data.childrenNameList[1]").value("Child2"));
+        assertEquals(HttpStatus.CREATED, response.getStatusCode());
+        assertNotNull(response.getBody());
+        assertEquals("Successfully created Student.", response.getBody().getMessage());
+        assertEquals(studentDto, response.getBody().getData());
+
+        verify(parentRoleService, times(1)).createStudent(studentRequest);
     }
 
     @Test
-    void getAllParents() throws Exception {
-        ParentDto parentDto = new ParentDto();
-        parentDto.setId(1L);
-        parentDto.setUser(new UserDto());
-        parentDto.setChildrenNameList(List.of("Child1", "Child2"));
+    void getChildList_NotFound() {
+        when(parentRoleService.getChildList()).thenThrow(new RuntimeException("No children found"));
 
-        when(parentService.getAllParent()).thenReturn(List.of(parentDto));
+        ResponseEntity<Response> response = parentController.getChildList();
 
-        mockMvc.perform(get("/ap1/v1/parent/get-all-parent"))
-                .andExpect(status().isOk())
-                .andExpect(jsonPath("$.message").value("Successfully retrieved all Parents."))
-                .andExpect(jsonPath("$.data[0].id").value(1L))
-                .andExpect(jsonPath("$.data[0].childrenNameList[0]").value("Child1"))
-                .andExpect(jsonPath("$.data[0].childrenNameList[1]").value("Child2"));
+        assertEquals(HttpStatus.NOT_FOUND, response.getStatusCode());
+        assertNotNull(response.getBody());
+        assertTrue(response.getBody().getMessage().contains("Children not found"));
+        assertNull(response.getBody().getData());
+
+        verify(parentRoleService, times(1)).getChildList();
     }
 
     @Test
-    void getAllParents_EmptyList() throws Exception {
-        when(parentService.getAllParent()).thenReturn(Collections.emptyList());
+    void getStudentSchedule_NotFound() {
+        Long childId = 1L;
+        when(parentRoleService.getStudentSchedule(childId))
+                .thenThrow(new RuntimeException("Child not found"));
 
-        mockMvc.perform(get("/ap1/v1/parent/get-all-parent"))
-                .andExpect(status().isNotFound())
-                .andExpect(jsonPath("$.message").value("No Parent found."))
-                .andExpect(jsonPath("$.status").value(404))
-                .andExpect(jsonPath("$.error").value("Resource not found"));
+        ResponseEntity<Response> response = parentController.getStudentSchedule(childId);
+
+        assertEquals(HttpStatus.NOT_FOUND, response.getStatusCode());
+        assertNotNull(response.getBody());
+        assertTrue(response.getBody().getMessage().contains("Couldn't find"));
+        assertNull(response.getBody().getData());
+
+        verify(parentRoleService, times(1)).getStudentSchedule(childId);
     }
 
     @Test
-    void getAllActiveParents() throws Exception {
-        ParentDto parentDto = new ParentDto();
-        parentDto.setId(1L);
-        parentDto.setUser(new UserDto());
-        parentDto.setChildrenNameList(List.of("Child1", "Child2"));
+    void deleteUser_Success() {
+        Long childId = 1L;
+        doNothing().when(parentRoleService).leaveSchool(childId);
 
-        when(parentService.getAllActiveParent()).thenReturn(List.of(parentDto));
+        ResponseEntity<String> response = parentController.deleteUser(childId);
 
-        mockMvc.perform(get("/ap1/v1/parent/get-all-active-parent"))
-                .andExpect(status().isOk())
-                .andExpect(jsonPath("$.message").value("Successfully retrieved all active Parents."))
-                .andExpect(jsonPath("$.data[0].id").value(1L))
-                .andExpect(jsonPath("$.data[0].childrenNameList[0]").value("Child1"))
-                .andExpect(jsonPath("$.data[0].childrenNameList[1]").value("Child2"));
+        assertEquals(HttpStatus.OK, response.getStatusCode());
+        assertEquals("Deleted Student successfully.", response.getBody());
+
+        verify(parentRoleService, times(1)).leaveSchool(childId);
     }
 
     @Test
-    void getAllActiveParents_EmptyList() throws Exception {
-        when(parentService.getAllActiveParent()).thenReturn(Collections.emptyList());
+    void deleteUser_NotFound() {
+        Long childId = 1L;
+        doThrow(new RuntimeException("Student not found")).when(parentRoleService).leaveSchool(childId);
 
-        mockMvc.perform(get("/ap1/v1/parent/get-all-active-parent"))
-                .andExpect(status().isNotFound())
-                .andExpect(jsonPath("$.message").value("No active Parent found."))
-                .andExpect(jsonPath("$.status").value(404))
-                .andExpect(jsonPath("$.error").value("Resource not found"));
-    }
+        ResponseEntity<String> response = parentController.deleteUser(childId);
 
-    @Test
-    void createParent() throws Exception {
-        ParentDto parentDto = new ParentDto();
-        parentDto.setId(1L);
-        parentDto.setUser(new UserDto());
-        parentDto.setChildrenNameList(List.of("Child1", "Child2"));
+        assertEquals(HttpStatus.NOT_FOUND, response.getStatusCode());
+        assertTrue(response.getBody().contains("Failed to delete"));
 
-        when(parentService.createParent(any(ParentDtoRequest.class))).thenReturn(parentDto);
-
-        mockMvc.perform(post("/ap1/v1/parent/create-parent")
-                        .contentType(MediaType.APPLICATION_JSON)
-                        .content("{\"userId\": 1}"))
-                .andExpect(status().isCreated())
-                .andExpect(jsonPath("$.message").value("Successfully created Parent."))
-                .andExpect(jsonPath("$.data.id").value(1L))
-                .andExpect(jsonPath("$.data.childrenNameList[0]").value("Child1"))
-                .andExpect(jsonPath("$.data.childrenNameList[1]").value("Child2"));
-    }
-
-    @Test
-    void updateParent() throws Exception {
-        ParentDto parentDto = new ParentDto();
-        parentDto.setId(1L);
-        parentDto.setUser(new UserDto());
-        parentDto.setChildrenNameList(List.of("Child1", "Child2"));
-
-        when(parentService.updateParent(any(ParentDtoRequest.class))).thenReturn(parentDto);
-
-        mockMvc.perform(put("/ap1/v1/parent/update-parent")
-                        .contentType(MediaType.APPLICATION_JSON)
-                        .content("{\"id\": 1, \"userId\": 1}"))
-                .andExpect(status().isOk())
-                .andExpect(jsonPath("$.message").value("Successfully updated Parent with id: 1"))
-                .andExpect(jsonPath("$.data.id").value(1L))
-                .andExpect(jsonPath("$.data.childrenNameList[0]").value("Child1"))
-                .andExpect(jsonPath("$.data.childrenNameList[1]").value("Child2"));
-    }
-
-    @Test
-    void deleteParent() throws Exception {
-        mockMvc.perform(delete("/ap1/v1/parent/delete-parent/1"))
-                .andExpect(status().isOk())
-                .andExpect(jsonPath("$.message").value("Successfully deleted Parent with id: 1"));
-    }
-
-    @Test
-    void restoreParent() throws Exception {
-        ParentDto parentDto = new ParentDto();
-        parentDto.setId(1L);
-        parentDto.setUser(new UserDto());
-        parentDto.setChildrenNameList(List.of("Child1", "Child2"));
-
-        when(parentService.restoreParent(anyLong())).thenReturn(parentDto);
-
-        mockMvc.perform(put("/ap1/v1/parent/restore-parent/1"))
-                .andExpect(status().isOk())
-                .andExpect(jsonPath("$.message").value("Successfully restored Parent with id: 1"))
-                .andExpect(jsonPath("$.data.id").value(1L))
-                .andExpect(jsonPath("$.data.childrenNameList[0]").value("Child1"))
-                .andExpect(jsonPath("$.data.childrenNameList[1]").value("Child2"));
+        verify(parentRoleService, times(1)).leaveSchool(childId);
     }
 }
