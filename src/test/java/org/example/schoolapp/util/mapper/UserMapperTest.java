@@ -4,7 +4,7 @@ import org.example.schoolapp.dto.request.UserDtoRequest;
 import org.example.schoolapp.dto.response.UserDto;
 import org.example.schoolapp.entity.Role;
 import org.example.schoolapp.entity.User;
-import org.example.schoolapp.service.RoleService;
+import org.example.schoolapp.service.entity.RoleService;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -41,7 +41,6 @@ class UserMapperTest {
 
         user = User.builder()
                 .id(1L)
-                .username("john-doe")
                 .firstName("John")
                 .lastName("Doe")
                 .middleName("Michael")
@@ -54,7 +53,6 @@ class UserMapperTest {
 
         userDtoRequest = UserDtoRequest.builder()
                 .id(1L)
-                .username("john-doe")
                 .firstName("John")
                 .lastName("Doe")
                 .middleName("Michael")
@@ -73,7 +71,6 @@ class UserMapperTest {
 
         assertNotNull(userDto);
         assertEquals(user.getId(), userDto.getId());
-        assertEquals(user.getUsername(), userDto.getUsername());
         assertEquals(user.getFirstName(), userDto.getFirstName());
         assertEquals(user.getLastName(), userDto.getLastName());
         assertEquals(user.getMiddleName(), userDto.getMiddleName());
@@ -90,7 +87,6 @@ class UserMapperTest {
 
         assertNotNull(userDtoList);
         assertEquals(1, userDtoList.size());
-        assertEquals(user.getUsername(), userDtoList.get(0).getUsername());
     }
 
     @Test
@@ -101,7 +97,6 @@ class UserMapperTest {
 
         assertNotNull(mappedUser);
         assertEquals(userDtoRequest.getId(), mappedUser.getId());
-        assertEquals(userDtoRequest.getUsername(), mappedUser.getUsername());
         assertEquals(userDtoRequest.getFirstName(), mappedUser.getFirstName());
         assertEquals(userDtoRequest.getLastName(), mappedUser.getLastName());
         assertEquals(userDtoRequest.getMiddleName(), mappedUser.getMiddleName());

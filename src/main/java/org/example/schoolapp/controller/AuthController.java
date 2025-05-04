@@ -6,7 +6,7 @@ import lombok.RequiredArgsConstructor;
 import org.example.schoolapp.dto.request.LoginRequest;
 import org.example.schoolapp.dto.request.RegisterRequest;
 import org.example.schoolapp.dto.response.AuthResponse;
-import org.example.schoolapp.service.impl.AuthService;
+import org.example.schoolapp.service.AuthService;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.PostMapping;

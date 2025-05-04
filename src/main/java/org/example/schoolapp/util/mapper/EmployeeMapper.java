@@ -6,8 +6,8 @@ import org.example.schoolapp.dto.response.EmployeeDto;
 import org.example.schoolapp.entity.Employee;
 import org.example.schoolapp.entity.Subject;
 import org.example.schoolapp.entity.User;
-import org.example.schoolapp.service.SubjectService;
-import org.example.schoolapp.service.UserService;
+import org.example.schoolapp.service.entity.SubjectService;
+import org.example.schoolapp.service.entity.UserService;
 import org.springframework.stereotype.Component;
 
 import java.util.HashSet;

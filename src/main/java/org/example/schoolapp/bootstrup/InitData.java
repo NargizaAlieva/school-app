@@ -6,7 +6,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.example.schoolapp.entity.*;
 import org.example.schoolapp.enums.DaysOfWeek;
 import org.example.schoolapp.enums.ParentStatus;
-import org.example.schoolapp.service.*;
+import org.example.schoolapp.service.entity.*;
 import org.springframework.stereotype.Component;
 
 import java.util.*;
@@ -53,7 +53,6 @@ public class InitData {
 
     private void createUsers() {
         User user1 = User.builder()
-                .username("alexsmith")
                 .firstName("Alex")
                 .lastName("Smith")
                 .middleName("Robert")
@@ -63,7 +62,6 @@ public class InitData {
                 .build();
 
         User user2 = User.builder()
-                .username("emilyw")
                 .firstName("Emily")
                 .lastName("Williams")
                 .middleName("Grace")
@@ -73,7 +71,6 @@ public class InitData {
                 .build();
 
         User user3 = User.builder()
-                .username("danielb")
                 .firstName("Daniel")
                 .lastName("Brown")
                 .middleName("Edward")
@@ -154,7 +151,6 @@ public class InitData {
 
     private void createEmployees() {
         User user1 = User.builder()
-                .username("johndoe")
                 .firstName("John")
                 .lastName("Doe")
                 .middleName("Michael")
@@ -164,7 +160,6 @@ public class InitData {
                 .build();
 
         User user2 = User.builder()
-                .username("janedoe")
                 .firstName("Jane")
                 .lastName("Doe")
                 .middleName("Elizabeth")
@@ -229,7 +224,6 @@ public class InitData {
 
     private void createParents() {
         User user1 = User.builder()
-                .username("melly")
                 .firstName("Emily")
                 .lastName("Williams")
                 .middleName("Anne")
@@ -239,7 +233,6 @@ public class InitData {
                 .build();
 
         User user2 = User.builder()
-                .username("eric")
                 .firstName("David")
                 .lastName("Smith")
                 .middleName("James")
@@ -265,7 +258,6 @@ public class InitData {
 
     private void createStudents() {
         User user1 = User.builder()
-                .username("sarahm")
                 .firstName("Sarah")
                 .lastName("Miller")
                 .middleName("Elizabeth")
@@ -275,7 +267,6 @@ public class InitData {
                 .build();
 
         User user2 = User.builder()
-                .username("michaelb")
                 .firstName("Michael")
                 .lastName("Brown")
                 .middleName("William")
@@ -285,7 +276,6 @@ public class InitData {
                 .build();
 
         User user3 = User.builder()
-                .username("niko")
                 .firstName("Niko")
                 .lastName("Brown")
                 .middleName("William")

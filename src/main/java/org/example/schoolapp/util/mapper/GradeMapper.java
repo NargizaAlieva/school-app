@@ -5,7 +5,7 @@ import org.example.schoolapp.dto.response.GradeDto;
 import org.example.schoolapp.dto.request.GradeDtoRequest;
 import org.example.schoolapp.entity.Grade;
 import org.example.schoolapp.entity.User;
-import org.example.schoolapp.service.EmployeeService;
+import org.example.schoolapp.service.entity.EmployeeService;
 import org.springframework.stereotype.Component;
 
 import java.time.LocalDateTime;

@@ -5,7 +5,7 @@ import org.example.schoolapp.dto.response.GradeDto;
 import org.example.schoolapp.entity.Employee;
 import org.example.schoolapp.entity.Grade;
 import org.example.schoolapp.entity.User;
-import org.example.schoolapp.service.EmployeeService;
+import org.example.schoolapp.service.entity.EmployeeService;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.mockito.InjectMocks;
@@ -34,7 +34,6 @@ class GradeMapperTest {
         MockitoAnnotations.openMocks(this);
 
         User user = User.builder()
-                .username("Sara Doe")
                 .firstName("Sara")
                 .lastName("Doe")
                 .middleName("M.")

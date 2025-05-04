@@ -4,7 +4,7 @@ import org.example.schoolapp.dto.request.LessonDtoRequest;
 import org.example.schoolapp.dto.response.LessonDto;
 import org.example.schoolapp.entity.*;
 import org.example.schoolapp.enums.DaysOfWeek;
-import org.example.schoolapp.service.ScheduleService;
+import org.example.schoolapp.service.entity.ScheduleService;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -44,7 +44,6 @@ class LessonMapperTest {
                 .build();
 
         User user = User.builder()
-                .username("Sara Doe")
                 .firstName("Sara")
                 .lastName("Doe")
                 .middleName("M.")

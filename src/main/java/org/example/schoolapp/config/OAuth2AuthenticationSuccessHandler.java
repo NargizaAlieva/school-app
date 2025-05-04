@@ -14,6 +14,7 @@ import org.example.schoolapp.repository.RoleRepository;
 import org.example.schoolapp.repository.TokenRepository;
 import org.example.schoolapp.repository.UserRepository;
 import org.springframework.security.core.Authentication;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.oauth2.client.authentication.OAuth2AuthenticationToken;
 import org.springframework.security.oauth2.core.user.OAuth2User;
 import org.springframework.security.web.authentication.AuthenticationSuccessHandler;
@@ -31,6 +32,8 @@ public class OAuth2AuthenticationSuccessHandler implements AuthenticationSuccess
     private final TokenRepository tokenRepository;
     private final UserRepository userRepository;
     private final RoleRepository roleRepository;
+    private final PasswordEncoder passwordEncoder;
+    private String randomPassword;
 
     @Override
     public void onAuthenticationSuccess(HttpServletRequest request, HttpServletResponse response,
@@ -57,7 +60,7 @@ public class OAuth2AuthenticationSuccessHandler implements AuthenticationSuccess
         saveUserToken(user, refreshToken, TokenType.REFRESH);
 
         setTokenCookies(response, accessToken, refreshToken);
-        sendTokenResponse(response, accessToken, refreshToken, user.getPassword());
+        sendTokenResponse(response, accessToken, refreshToken);
     }
 
     private String getEmailFromOAuthUser(OAuth2User oauthUser, AuthProvider provider) {
@@ -82,13 +85,13 @@ public class OAuth2AuthenticationSuccessHandler implements AuthenticationSuccess
     }
 
     private User createNewUser(String email, String username, String[] nameParts, AuthProvider provider) {
+        randomPassword = UUID.randomUUID().toString();
         User newUser = User.builder()
                 .email(email)
-                .username(username)
                 .firstName(nameParts[0])
                 .lastName(nameParts.length > 1 ? nameParts[1] : "")
                 .provider(provider)
-                .password(UUID.randomUUID().toString())
+                .password(passwordEncoder.encode(randomPassword))
                 .roleSet(new HashSet<>())
                 .build();
         newUser = userRepository.save(newUser);
@@ -113,15 +116,15 @@ public class OAuth2AuthenticationSuccessHandler implements AuthenticationSuccess
         response.addCookie(refreshTokenCookie);
     }
 
-    private void sendTokenResponse(HttpServletResponse response, String accessToken, String refreshToken, String generatedPassword)
+    private void sendTokenResponse(HttpServletResponse response, String accessToken, String refreshToken)
             throws IOException, java.io.IOException {
         response.setContentType("application/json");
         response.setCharacterEncoding("UTF-8");
         response.getWriter().write(String.format(
-                "{\"accessToken\":\"%s\", \"refreshToken\":\"%s\", \"generatedPassword\":\"%s\"}",
+                "{\"accessToken\":\"%s\", \"refreshToken\":\"%s\", \"randomPassword\":\"%s\"}",
                 accessToken,
                 refreshToken,
-                generatedPassword
+                randomPassword
         ));
     }
 

@@ -27,7 +27,7 @@ public class UserValidationTest {
     @Test
     public void whenUserIsValid_thenNoViolations() {
         User user = User.builder()
-                .username("validUsername")
+                .username("username")
                 .firstName("John")
                 .lastName("Doe")
                 .email("john.doe@example.com")
@@ -44,7 +44,6 @@ public class UserValidationTest {
     @Test
     public void whenUsernameIsNull_thenTwoViolations() {
         User user = User.builder()
-                .username(null)
                 .firstName("John")
                 .lastName("Doe")
                 .email("john.doe@example.com")
@@ -84,7 +83,7 @@ public class UserValidationTest {
     @Test
     public void whenUsernameIsTooShort_thenOneViolation() {
         User user = User.builder()
-                .username("ab")
+                .username("me")
                 .firstName("John")
                 .lastName("Doe")
                 .email("john.doe@example.com")
@@ -101,7 +100,7 @@ public class UserValidationTest {
     @Test
     public void whenEmailIsInvalid_thenOneViolation() {
         User user = User.builder()
-                .username("validUsername")
+                .username("JohnDoe")
                 .firstName("John")
                 .lastName("Doe")
                 .email("invalid-email")
@@ -118,7 +117,7 @@ public class UserValidationTest {
     @Test
     public void whenPasswordIsTooShort_thenOneViolation() {
         User user = User.builder()
-                .username("validUsername")
+                .username("JohnDoe")
                 .firstName("John")
                 .lastName("Doe")
                 .email("john.doe@example.com")

@@ -4,7 +4,7 @@ import lombok.RequiredArgsConstructor;
 import org.example.schoolapp.dto.request.LessonDtoRequest;
 import org.example.schoolapp.dto.response.LessonDto;
 import org.example.schoolapp.entity.Lesson;
-import org.example.schoolapp.service.ScheduleService;
+import org.example.schoolapp.service.entity.ScheduleService;
 import org.springframework.stereotype.Component;
 
 import java.time.LocalDateTime;

@@ -25,7 +25,7 @@ public interface StudentRepository extends JpaRepository<Student, Long> {
     List<Student> findAllActiveStudentsByGrade(@Param("gradeId") Long gradeId);
 
     @Query("SELECT s FROM Student s WHERE s.grade.id IN :gradeIds AND s.user.isActive = true")
-    List<Student> findAllActiveStudentsByGrades(@Param("gradeIds") List<Long> gradeIds);
+    List<Student> findAllActiveStudentsByGrades(@Param("gradeIds") List<Long> gradeIds);;
 
     @Query("SELECT s FROM Student s JOIN s.parent p WHERE p.id = :parentId")
     List<Student> findParentStudentsByParentId(@Param("parentId") Long parentId);

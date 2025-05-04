@@ -25,7 +25,6 @@ class UserDtoRequestValidationTest {
     @Test
     void testValidUserDto() {
         UserDtoRequest user = UserDtoRequest.builder()
-                .username("john_doe")
                 .firstName("John")
                 .lastName("Doe")
                 .middleName("A")
@@ -40,23 +39,8 @@ class UserDtoRequestValidationTest {
     }
 
     @Test
-    void testInvalidUsername() {
-        UserDtoRequest user = UserDtoRequest.builder()
-                .username("a")
-                .firstName("John")
-                .lastName("Doe")
-                .email("john.doe@example.com")
-                .password("securePass1")
-                .build();
-
-        Set<ConstraintViolation<UserDtoRequest>> violations = validator.validate(user);
-        assertFalse(violations.isEmpty(), "Username validation should fail");
-    }
-
-    @Test
     void testInvalidEmail() {
         UserDtoRequest user = UserDtoRequest.builder()
-                .username("john_doe")
                 .firstName("John")
                 .lastName("Doe")
                 .email("invalid-email")
@@ -70,7 +54,6 @@ class UserDtoRequestValidationTest {
     @Test
     void testShortPassword() {
         UserDtoRequest user = UserDtoRequest.builder()
-                .username("john_doe")
                 .firstName("John")
                 .lastName("Doe")
                 .email("john.doe@example.com")
@@ -84,7 +67,6 @@ class UserDtoRequestValidationTest {
     @Test
     void testInvalidPhone() {
         UserDtoRequest user = UserDtoRequest.builder()
-                .username("john_doe")
                 .firstName("John")
                 .lastName("Doe")
                 .email("john.doe@example.com")

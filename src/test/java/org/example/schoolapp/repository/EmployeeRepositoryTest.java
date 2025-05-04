@@ -32,7 +32,6 @@ public class EmployeeRepositoryTest {
     @BeforeEach
     public void setUp() {
         user = User.builder()
-                .username("testuser")
                 .firstName("John")
                 .lastName("Doe")
                 .email("john.doe@example.com")
@@ -101,7 +100,6 @@ public class EmployeeRepositoryTest {
     @Test
     public void whenGetHomeTeacherByGradeId_thenReturnEmployee() {
         User homeTeacherUser = User.builder()
-                .username("hometeacher")
                 .firstName("Home")
                 .lastName("Teacher")
                 .email("hometeacher@example.com")

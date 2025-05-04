@@ -16,11 +16,6 @@ import java.util.Set;
 public class UserDtoRequest {
     private Long id;
 
-    @NotNull(message = "Username cannot be null")
-    @NotBlank(message = "Username cannot be empty")
-    @Size(min = 3, max = 50, message = "Username must be between 3 and 50 characters")
-    private String username;
-
     @NotNull(message = "First name cannot be null")
     @NotBlank(message = "First name cannot be empty")
     @Size(max = 50, message = "First name must be at most 50 characters")

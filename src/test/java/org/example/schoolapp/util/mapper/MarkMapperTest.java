@@ -5,8 +5,8 @@ import org.example.schoolapp.dto.response.MarkDto;
 import org.example.schoolapp.entity.*;
 import org.example.schoolapp.enums.DaysOfWeek;
 import org.example.schoolapp.enums.ParentStatus;
-import org.example.schoolapp.service.LessonService;
-import org.example.schoolapp.service.StudentService;
+import org.example.schoolapp.service.entity.LessonService;
+import org.example.schoolapp.service.entity.StudentService;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.mockito.InjectMocks;
@@ -49,7 +49,6 @@ class MarkMapperTest {
                 .build();
 
         User user = User.builder()
-                .username("Sara Doe")
                 .firstName("Sara")
                 .lastName("Doe")
                 .middleName("M.")
@@ -84,7 +83,6 @@ class MarkMapperTest {
 
         User parentUser = User.builder()
                 .id(1L)
-                .username("john")
                 .firstName("John")
                 .lastName("Doe")
                 .email("john.doe@example.com")
@@ -97,7 +95,6 @@ class MarkMapperTest {
 
         User studentUser = User.builder()
                 .id(1L)
-                .username("sara")
                 .firstName("Sara")
                 .lastName("Doe")
                 .email("sara.doe@example.com")

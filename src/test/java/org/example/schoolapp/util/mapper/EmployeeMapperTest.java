@@ -6,8 +6,8 @@ import org.example.schoolapp.dto.response.UserDto;
 import org.example.schoolapp.entity.Employee;
 import org.example.schoolapp.entity.Subject;
 import org.example.schoolapp.entity.User;
-import org.example.schoolapp.service.SubjectService;
-import org.example.schoolapp.service.UserService;
+import org.example.schoolapp.service.entity.SubjectService;
+import org.example.schoolapp.service.entity.UserService;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -45,7 +45,6 @@ class EmployeeMapperTest {
     void setUp() {
         user = User.builder()
                 .id(1L)
-                .username("john")
                 .firstName("John")
                 .lastName("Doe")
                 .email("john.doe@example.com")
@@ -74,7 +73,6 @@ class EmployeeMapperTest {
 
         UserDto userDto = UserDto.builder()
                 .id(1L)
-                .username("john")
                 .firstName("John")
                 .lastName("Doe")
                 .email("john.doe@example.com")

@@ -35,7 +35,6 @@ public class ScheduleRepositoryTest {
         entityManager.persist(subject);
 
         User user1 = User.builder()
-                .username("john-doe")
                 .firstName("John")
                 .lastName("Doe")
                 .middleName("Michael")

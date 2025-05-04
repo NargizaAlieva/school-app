@@ -4,8 +4,8 @@ import lombok.RequiredArgsConstructor;
 import org.example.schoolapp.dto.response.MarkDto;
 import org.example.schoolapp.dto.request.MarkDtoRequest;
 import org.example.schoolapp.entity.Mark;
-import org.example.schoolapp.service.LessonService;
-import org.example.schoolapp.service.StudentService;
+import org.example.schoolapp.service.entity.LessonService;
+import org.example.schoolapp.service.entity.StudentService;
 import org.springframework.stereotype.Component;
 
 import java.util.List;

@@ -6,9 +6,9 @@ import org.example.schoolapp.dto.request.ScheduleDtoRequest;
 import org.example.schoolapp.entity.Schedule;
 import org.example.schoolapp.entity.User;
 import org.example.schoolapp.enums.DaysOfWeek;
-import org.example.schoolapp.service.EmployeeService;
-import org.example.schoolapp.service.GradeService;
-import org.example.schoolapp.service.SubjectService;
+import org.example.schoolapp.service.entity.EmployeeService;
+import org.example.schoolapp.service.entity.GradeService;
+import org.example.schoolapp.service.entity.SubjectService;
 import org.springframework.stereotype.Component;
 
 import java.util.List;

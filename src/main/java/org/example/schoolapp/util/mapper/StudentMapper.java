@@ -5,9 +5,9 @@ import org.example.schoolapp.dto.response.StudentDto;
 import org.example.schoolapp.dto.request.StudentDtoRequest;
 import org.example.schoolapp.entity.Student;
 import org.example.schoolapp.enums.ParentStatus;
-import org.example.schoolapp.service.GradeService;
-import org.example.schoolapp.service.ParentService;
-import org.example.schoolapp.service.UserService;
+import org.example.schoolapp.service.entity.GradeService;
+import org.example.schoolapp.service.entity.ParentService;
+import org.example.schoolapp.service.entity.UserService;
 import org.springframework.stereotype.Component;
 
 import java.util.List;

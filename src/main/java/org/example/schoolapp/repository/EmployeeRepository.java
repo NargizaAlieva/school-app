@@ -26,4 +26,7 @@ public interface EmployeeRepository extends JpaRepository<Employee, Long> {
 
     @Query("SELECT g.classTeacher FROM Grade g WHERE g.id = :gradeId")
     Employee getHomeTeacherByGradeId(@Param("gradeId") Long gradeId);
+
+    @Query("SELECT g.id FROM Employee e JOIN e.homeGrades g WHERE e.id = :employeeId")
+    List<Long> findHomeGradeIdsByEmployeeId(@Param("employeeId") Long employeeId);
 }

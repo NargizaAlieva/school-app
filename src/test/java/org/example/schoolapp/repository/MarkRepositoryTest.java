@@ -30,7 +30,6 @@ public class MarkRepositoryTest {
     @BeforeEach
     public void setUp() {
         User user1 = User.builder()
-                .username("parentuser")
                 .firstName("Alice")
                 .lastName("Smith")
                 .email("alice.smith@example.com")
@@ -52,7 +51,6 @@ public class MarkRepositoryTest {
         entityManager.persist(subject);
 
         User user2 = User.builder()
-                .username("teacheruser")
                 .firstName("Nana")
                 .lastName("Mara")
                 .email("nana.smith@example.com")
@@ -76,7 +74,6 @@ public class MarkRepositoryTest {
         entityManager.persist(grade);
 
         User user3 = User.builder()
-                .username("studentuser")
                 .firstName("Mark")
                 .lastName("Smith")
                 .email("mark.smith@example.com")

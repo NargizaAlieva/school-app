@@ -33,7 +33,6 @@ public class UserRepositoryTest {
         entityManager.persist(role);
 
         user = User.builder()
-                .username("testuser")
                 .firstName("John")
                 .lastName("Doe")
                 .email("john.doe@example.com")

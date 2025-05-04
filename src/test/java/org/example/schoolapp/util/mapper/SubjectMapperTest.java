@@ -87,7 +87,6 @@ class SubjectMapperTest {
 
     private Employee createMockEmployee() {
         User user = User.builder()
-                .username("John Doe")
                 .firstName("John")
                 .lastName("Doe")
                 .email("john@doe.com")

@@ -4,9 +4,9 @@ import org.example.schoolapp.dto.request.ScheduleDtoRequest;
 import org.example.schoolapp.dto.response.ScheduleDto;
 import org.example.schoolapp.entity.*;
 import org.example.schoolapp.enums.DaysOfWeek;
-import org.example.schoolapp.service.EmployeeService;
-import org.example.schoolapp.service.GradeService;
-import org.example.schoolapp.service.SubjectService;
+import org.example.schoolapp.service.entity.EmployeeService;
+import org.example.schoolapp.service.entity.GradeService;
+import org.example.schoolapp.service.entity.SubjectService;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.mockito.InjectMocks;
@@ -47,7 +47,6 @@ class ScheduleMapperTest {
                 .build();
 
         User user = User.builder()
-                .username("Sara Doe")
                 .firstName("Sara")
                 .lastName("Doe")
                 .middleName("M.")

@@ -4,7 +4,7 @@ import org.example.schoolapp.dto.request.ParentDtoRequest;
 import org.example.schoolapp.dto.response.ParentDto;
 import org.example.schoolapp.entity.*;
 import org.example.schoolapp.enums.ParentStatus;
-import org.example.schoolapp.service.UserService;
+import org.example.schoolapp.service.entity.UserService;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -37,7 +37,6 @@ class ParentMapperTest {
     void setUp() {
         user = User.builder()
                 .id(1L)
-                .username("john")
                 .firstName("John")
                 .lastName("Doe")
                 .email("john.doe@example.com")
@@ -56,7 +55,6 @@ class ParentMapperTest {
 
         User teacherUser = User.builder()
                 .id(1L)
-                .username("mara")
                 .firstName("Mara")
                 .lastName("Ave")
                 .email("mara.ave@example.com")
@@ -78,7 +76,6 @@ class ParentMapperTest {
 
         User childUser = User.builder()
                 .id(1L)
-                .username("sara")
                 .firstName("Sara")
                 .lastName("Doe")
                 .email("sara.doe@example.com")

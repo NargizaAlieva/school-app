@@ -5,7 +5,7 @@ import org.example.schoolapp.dto.request.UserDtoRequest;
 import org.example.schoolapp.dto.response.UserDto;
 import org.example.schoolapp.entity.Role;
 import org.example.schoolapp.entity.User;
-import org.example.schoolapp.service.RoleService;
+import org.example.schoolapp.service.entity.RoleService;
 import org.springframework.stereotype.Component;
 
 import java.util.HashSet;
@@ -21,7 +21,6 @@ public class UserMapper {
     public UserDto toUserDto(User user) {
         return new UserDto().toBuilder()
                 .id(user.getId())
-                .username(user.getUsername())
                 .firstName(user.getFirstName())
                 .lastName(user.getLastName())
                 .middleName(user.getMiddleName())
@@ -40,7 +39,6 @@ public class UserMapper {
     public User toUserEntity(UserDtoRequest userDtoRequest) {
         return new User().toBuilder()
                 .id(userDtoRequest.getId())
-                .username(userDtoRequest.getUsername())
                 .firstName(userDtoRequest.getFirstName())
                 .lastName(userDtoRequest.getLastName())
                 .middleName(userDtoRequest.getMiddleName())

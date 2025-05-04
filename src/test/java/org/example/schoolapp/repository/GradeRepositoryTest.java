@@ -30,7 +30,6 @@ public class GradeRepositoryTest {
     @BeforeEach
     public void setUp() {
         User user1 = User.builder()
-                .username("parentuser")
                 .firstName("Alice")
                 .lastName("Smith")
                 .email("alice.smith@example.com")
@@ -45,7 +44,6 @@ public class GradeRepositoryTest {
         entityManager.persist(parent);
 
         User user2 = User.builder()
-                .username("teacheruser")
                 .firstName("Nana")
                 .lastName("Mara")
                 .email("nana.smith@example.com")
@@ -69,7 +67,6 @@ public class GradeRepositoryTest {
         entityManager.persist(grade);
 
         User user3 = User.builder()
-                .username("studentuser")
                 .firstName("Marry")
                 .lastName("Smith")
                 .email("marry.smith@example.com")

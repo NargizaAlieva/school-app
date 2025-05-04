@@ -27,7 +27,6 @@ public class ParentRepositoryTest {
     @BeforeEach
     public void setUp() {
         user = User.builder()
-                .username("parentuser")
                 .firstName("Jane")
                 .lastName("Doe")
                 .email("jane.doe@example.com")

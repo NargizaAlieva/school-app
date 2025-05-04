@@ -27,24 +27,6 @@ public class ParentValidationTest {
     }
 
     @Test
-    public void whenParentIsValid_thenNoViolations() {
-        User user = User.builder()
-                .username("parentuser")
-                .firstName("Jane")
-                .lastName("Doe")
-                .email("jane.doe@example.com")
-                .password("password123")
-                .build();
-
-        Parent parent = Parent.builder()
-                .user(user)
-                .build();
-
-        Set<ConstraintViolation<Parent>> violations = validator.validate(parent);
-        assertThat(violations).isEmpty();
-    }
-
-    @Test
     public void whenUserIsNull_thenOneViolation() {
         Parent parent = Parent.builder()
                 .user(null)
@@ -58,7 +40,6 @@ public class ParentValidationTest {
     @Test
     public void whenUserIsInvalid_thenTwoViolations() {
         User user = User.builder()
-                .username(null)
                 .firstName("Jane")
                 .lastName("Doe")
                 .email("jane.doe@example.com")

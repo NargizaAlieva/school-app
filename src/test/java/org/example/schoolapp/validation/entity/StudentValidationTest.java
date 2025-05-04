@@ -28,7 +28,6 @@ public class StudentValidationTest {
     @Test
     public void whenStudentIsValid_thenNoViolations() {
         User user = User.builder()
-                .username("studentuser")
                 .firstName("John")
                 .lastName("Doe")
                 .email("john.doe@example.com")
@@ -59,7 +58,6 @@ public class StudentValidationTest {
     @Test
     public void whenParentStatusIsNull_thenOneViolation() {
         User user = User.builder()
-                .username("studentuser")
                 .firstName("John")
                 .lastName("Doe")
                 .email("john.doe@example.com")
@@ -92,7 +90,6 @@ public class StudentValidationTest {
     public void whenUserIsNull_thenOneViolation() {
         Parent parent = Parent.builder()
                 .user(User.builder()
-                        .username("parentuser")
                         .firstName("Jane")
                         .lastName("Doe")
                         .email("jane.doe@example.com")
@@ -121,7 +118,6 @@ public class StudentValidationTest {
     @Test
     public void whenParentIsNull_thenOneViolation() {
         User user = User.builder()
-                .username("studentuser")
                 .firstName("John")
                 .lastName("Doe")
                 .email("john.doe@example.com")
@@ -150,7 +146,6 @@ public class StudentValidationTest {
     @Test
     public void whenGradeIsNull_thenOneViolation() {
         User user = User.builder()
-                .username("studentuser")
                 .firstName("John")
                 .lastName("Doe")
                 .email("john.doe@example.com")

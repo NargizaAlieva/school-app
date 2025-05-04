@@ -6,7 +6,7 @@ import org.example.schoolapp.dto.request.ParentDtoRequest;
 import org.example.schoolapp.entity.Parent;
 import org.example.schoolapp.entity.Student;
 import org.example.schoolapp.entity.User;
-import org.example.schoolapp.service.UserService;
+import org.example.schoolapp.service.entity.UserService;
 import org.springframework.stereotype.Component;
 
 import java.util.ArrayList;
