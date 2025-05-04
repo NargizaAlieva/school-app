@@ -78,7 +78,7 @@ public class OAuth2AuthenticationSuccessHandler implements AuthenticationSuccess
         return email;
     }
 
-    private String getNameFromOAuthUser(OAuth2User oauthUser, AuthProvider provider) {
+    public String getNameFromOAuthUser(OAuth2User oauthUser, AuthProvider provider) {
         String name = oauthUser.getAttribute("name");
 
         if (name == null && provider == AuthProvider.GITHUB)
@@ -87,7 +87,7 @@ public class OAuth2AuthenticationSuccessHandler implements AuthenticationSuccess
         return name;
     }
 
-    private User createNewUser(String email, String[] nameParts, AuthProvider provider) {
+    public User createNewUser(String email, String[] nameParts, AuthProvider provider) {
         randomPassword = UUID.randomUUID().toString();
         User newUser = User.builder()
                 .email(email)
@@ -104,7 +104,7 @@ public class OAuth2AuthenticationSuccessHandler implements AuthenticationSuccess
         return newUser;
     }
 
-    private void sendTokenResponse(HttpServletResponse response, String accessToken, String refreshToken)
+    public void sendTokenResponse(HttpServletResponse response, String accessToken, String refreshToken)
             throws IOException, java.io.IOException {
         response.setContentType("application/json");
         response.setCharacterEncoding("UTF-8");

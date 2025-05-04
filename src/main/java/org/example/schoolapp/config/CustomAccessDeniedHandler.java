@@ -4,7 +4,6 @@ import org.springframework.security.web.access.AccessDeniedHandler;
 import org.springframework.stereotype.Component;
 import jakarta.servlet.http.*;
 import java.io.IOException;
-import java.io.NotActiveException;
 
 @Component
 public class CustomAccessDeniedHandler implements AccessDeniedHandler {
