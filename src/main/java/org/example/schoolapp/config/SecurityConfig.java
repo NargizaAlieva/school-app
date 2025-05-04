@@ -40,13 +40,9 @@ public class SecurityConfig {
                     corsConfiguration.setAllowCredentials(true);
                     return corsConfiguration;
                 }))
-                .exceptionHandling(exception -> exception
-                        .authenticationEntryPoint(customAuthenticationEntryPoint)
-                        .accessDeniedHandler(customAccessDeniedHandler)
-                )
                 .authorizeHttpRequests(request -> request
                         .requestMatchers("/v3/api-docs/**", "/swagger-ui/**", "/swagger-ui.html").permitAll()
-                        .requestMatchers("/api/v1/auth/**", "/email/**", "/oauth2/**").permitAll()
+                        .requestMatchers("/api/v1/auth/**", "/oauth2/**").permitAll()
                         .requestMatchers("api/v1/admin/**").authenticated()
 //                        .requestMatchers("api/v1/admin/**").hasRole("ADMIN")
                         .requestMatchers("api/v1/class-teacher/**").hasRole("CLASS_TEACHER")
@@ -68,6 +64,9 @@ public class SecurityConfig {
                 )
                 .oauth2Login(oauth2 -> oauth2
                         .successHandler(oAuth2AuthenticationSuccessHandler)
+                )
+                .exceptionHandling(exception -> exception
+                        .accessDeniedHandler(customAccessDeniedHandler)
                 )
                 .addFilterBefore(jwtAuthenticationFilter, UsernamePasswordAuthenticationFilter.class);
         return http.build();

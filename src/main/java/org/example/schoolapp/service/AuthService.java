@@ -12,13 +12,14 @@ import org.example.schoolapp.entity.Role;
 import org.example.schoolapp.entity.User;
 import org.example.schoolapp.enums.AuthProvider;
 import org.example.schoolapp.enums.TokenType;
-import org.example.schoolapp.repository.UserRepository;
 import org.example.schoolapp.service.entity.RoleService;
 import org.example.schoolapp.service.entity.TokenService;
+import org.example.schoolapp.service.entity.UserService;
+import org.example.schoolapp.util.exception.NoTokenProvided;
+import org.example.schoolapp.util.exception.VerificationException;
 import org.springframework.http.HttpHeaders;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
-import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
@@ -29,7 +30,7 @@ import java.util.Set;
 @Service
 @RequiredArgsConstructor
 public class AuthService {
-    private final UserRepository userRepository;
+    private final UserService userService;
     private final TokenService tokenService;
     private final PasswordEncoder passwordEncoder;
     private final RoleService roleService;
@@ -52,17 +53,16 @@ public class AuthService {
                 .isEnabled(false)
                 .provider(AuthProvider.LOCAL)
                 .build();
-        userRepository.save(user);
+        userService.createUser(user);
 
         emailService.sendVerificationEmail(user);
     }
 
     public void login(LoginRequest request) {
-        var user = userRepository.findByEmail(request.getEmail())
-                .orElseThrow(() -> new UsernameNotFoundException("User not found"));
+        var user = userService.getEntityByEmail(request.getEmail());
 
-        if (user.isEnabled()) {
-            throw new RuntimeException("Please first verify your email");
+        if (!user.getIsEnabled()) {
+            throw new VerificationException();
         }
 
         authenticationManager.authenticate(
@@ -84,15 +84,14 @@ public class AuthService {
         final String username;
 
         if (authHeader == null || !authHeader.startsWith("Bearer ")) {
-            return;
+            throw new NoTokenProvided();
         }
 
         refreshToken = authHeader.substring(7);
         username = jwtService.extractUsername(refreshToken);
 
         if (username != null) {
-            var userDetails = this.userRepository.findByEmail(username)
-                    .orElseThrow(() -> new UsernameNotFoundException("User not found"));
+            var userDetails = this.userService.getEntityByEmail(username);
 
             if (jwtService.isTokenValid(refreshToken, userDetails)) {
                 tokenService.revokeAllUserTokens(userDetails);

@@ -24,7 +24,7 @@ public class JwtAuthenticationSuccessHandler implements AuthenticationSuccessHan
                                         Authentication authentication) throws IOException {
         User user = (User) authentication.getPrincipal();
 
-        if (user.isEnabled()) {
+        if (!user.getIsEnabled()) {
             response.setContentType(MediaType.APPLICATION_JSON_VALUE);
             new ObjectMapper().writeValue(response.getWriter(), "Please first verify your email");
 

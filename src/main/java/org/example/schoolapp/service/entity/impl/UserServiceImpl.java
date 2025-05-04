@@ -66,10 +66,14 @@ public class UserServiceImpl implements UserService {
     }
 
     @Override
-    public UserDto getByEmail(String mail) {
-        User user = userRepository.findByEmail(mail)
+    public User getEntityByEmail(String mail) {
+        return userRepository.findByEmail(mail)
                 .orElseThrow(() -> new ObjectNotFoundException("User with mail: '" + mail + "' not found"));
-        return userMapper.toUserDto(user);
+    }
+
+    @Override
+    public UserDto getByEmail(String mail) {
+        return userMapper.toUserDto(getEntityByEmail(mail));
     }
 
     @Override
@@ -101,6 +105,13 @@ public class UserServiceImpl implements UserService {
     public UserDto createUser(UserDtoRequest userDtoRequest) {
         if (!isEmailExist(userDtoRequest.getEmail()))
             return saveUser(userMapper.toUserEntity(userDtoRequest));
+        return null;
+    }
+
+    @Override
+    public User createUser(User user) {
+        if (!isEmailExist(user.getEmail()))
+            return save(user);
         return null;
     }
 

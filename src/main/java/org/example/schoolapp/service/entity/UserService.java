@@ -12,6 +12,9 @@ public interface UserService {
     User getEntityById(Long id);
     UserDto getById(Long id);
     UserDto getByUsername(String username);
+
+    User getEntityByEmail(String mail);
+
     UserDto getByEmail(String mail);
     User getCurrentUser();
 
@@ -22,6 +25,7 @@ public interface UserService {
 
     UserDto saveUser(User user);
     UserDto createUser(UserDtoRequest userDtoRequest);
+    User createUser(User user);
     UserDto updateUser(UserDtoRequest userDtoRequest);
 
     UserDto restoreUser(Long id);

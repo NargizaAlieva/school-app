@@ -11,6 +11,8 @@ import org.example.schoolapp.enums.TokenType;
 import org.example.schoolapp.repository.RoleRepository;
 import org.example.schoolapp.repository.UserRepository;
 import org.example.schoolapp.service.entity.TokenService;
+import org.example.schoolapp.service.entity.UserService;
+import org.example.schoolapp.util.mapper.UserMapper;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.oauth2.client.authentication.OAuth2AuthenticationToken;
@@ -24,10 +26,11 @@ import java.util.UUID;
 @Component
 @RequiredArgsConstructor
 public class OAuth2AuthenticationSuccessHandler implements AuthenticationSuccessHandler {
-
     private final JWTService jwtService;
     private final TokenService tokenService;
+    private final UserService userService;
     private final UserRepository userRepository;
+    private final UserMapper userMapper;
     private final RoleRepository roleRepository;
     private final PasswordEncoder passwordEncoder;
     private String randomPassword;
@@ -95,7 +98,7 @@ public class OAuth2AuthenticationSuccessHandler implements AuthenticationSuccess
                 .isEnabled(true)
                 .roleSet(new HashSet<>())
                 .build();
-        newUser = userRepository.save(newUser);
+        newUser = userService.createUser(newUser);
         Role role = roleRepository.findByTitle("USER").orElseThrow();
         newUser.getRoleSet().add(role);
         return newUser;

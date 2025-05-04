@@ -26,6 +26,16 @@ public class GlobalExceptionHandler {
         return buildErrorResponse(HttpStatus.BAD_REQUEST, "Validation failed", errorMessage);
     }
 
+    @ExceptionHandler(TokenExpiredException.class)
+    public ResponseEntity<Map<String, Object>> handleVerificationException(TokenExpiredException ex) {
+        return buildErrorResponse(HttpStatus.BAD_REQUEST, "Login falure", ex.getMessage());
+    }
+
+    @ExceptionHandler(NoTokenProvided.class)
+    public ResponseEntity<Map<String, Object>> handleVerificationException(NoTokenProvided ex) {
+        return buildErrorResponse(HttpStatus.BAD_REQUEST, "Login falure", ex.getMessage());
+    }
+
     @ExceptionHandler(VerificationException.class)
     public ResponseEntity<Map<String, Object>> handleVerificationException(VerificationException ex) {
         return buildErrorResponse(HttpStatus.BAD_REQUEST, "Registration falure", ex.getMessage());

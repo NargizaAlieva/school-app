@@ -92,9 +92,6 @@ public class User implements UserDetails {
         if (isActive == null)
             isActive = true;
 
-        if (isEnabled == null)
-            isEnabled = false;
-
         if(provider == null)
             provider = AuthProvider.LOCAL;
 

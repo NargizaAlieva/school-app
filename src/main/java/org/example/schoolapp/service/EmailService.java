@@ -2,7 +2,6 @@ package org.example.schoolapp.service;
 
 import jakarta.servlet.http.HttpServletResponse;
 import lombok.RequiredArgsConstructor;
-import lombok.extern.slf4j.Slf4j;
 import org.example.schoolapp.config.JWTService;
 import org.example.schoolapp.entity.Token;
 import org.example.schoolapp.entity.User;
@@ -10,6 +9,7 @@ import org.example.schoolapp.enums.TokenType;
 import org.example.schoolapp.repository.UserRepository;
 import org.example.schoolapp.service.entity.TokenService;
 import org.example.schoolapp.util.exception.ObjectNotFoundException;
+import org.example.schoolapp.util.exception.TokenExpiredException;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.mail.SimpleMailMessage;
 import org.springframework.mail.javamail.JavaMailSender;
@@ -20,17 +20,14 @@ import java.util.UUID;
 
 @Service
 @RequiredArgsConstructor
-@Slf4j
 public class EmailService {
     private final UserRepository userRepository;
     private final JWTService jwtService;
     private final TokenService tokenService;
     private final JavaMailSender mailSender;
 
-    @Value("${server.port}")
-    private int serverPort;
-
-    private final String baseUrl= "http://localhost: " + serverPort + "/api/v1/";
+    @Value("${base-url}")
+    private String baseUrl;
 
     public void sendVerificationEmail(String email) {
         User user = userRepository.findByEmail(email)
@@ -67,12 +64,10 @@ public class EmailService {
     }
 
     public void verifyTokenAndGenerateTokens(String token, HttpServletResponse response) throws IOException {
-        log.info("token: {}", token);
-
         Token verificationToken = tokenService.getByToken(token);
 
         if (verificationToken.isExpired() || verificationToken.isRevoked())
-            throw new IllegalStateException("Token expired. You can get new Verification token by this link: " + baseUrl + "auth/get-verification-token/" + "your email");
+            throw new TokenExpiredException("Token expired. You can get new Verification token by this link: " + baseUrl + "auth/get-verification-token/" + "your email");
 
         User user = verificationToken.getUser();
         user.setIsEnabled(true);
