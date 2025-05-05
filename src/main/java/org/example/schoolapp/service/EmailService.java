@@ -73,6 +73,10 @@ public class EmailService {
         user.setIsEnabled(true);
         userRepository.save(user);
 
+        generateTokens(response, user);
+    }
+
+    public void generateTokens(HttpServletResponse response, User user) throws IOException {
         String accessToken = jwtService.generateToken(user);
         String refreshToken = jwtService.generateRefreshToken(user);
 
@@ -84,7 +88,7 @@ public class EmailService {
         sendTokenResponse(response, accessToken, refreshToken);
     }
 
-    private void sendTokenResponse(HttpServletResponse response, String accessToken, String refreshToken)
+    public void sendTokenResponse(HttpServletResponse response, String accessToken, String refreshToken)
             throws IOException {
         response.setContentType("application/json");
         response.setCharacterEncoding("UTF-8");

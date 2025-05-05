@@ -51,8 +51,27 @@ public class UserServiceImpl implements UserService {
     }
 
     @Override
+    public void enable2FA() {
+        User user = getCurrentUser();
+        user.setIs2FAEnabled(true);
+        save(user);
+    }
+
+    @Override
+    public void disable2FA() {
+        User user = getCurrentUser();
+        user.setIs2FAEnabled(false);
+        save(user);
+    }
+
+    @Override
     public User save(User user) {
         return userRepository.save(user);
+    }
+
+    @Override
+    public UserDto getById() {
+        return userMapper.toUserDto(getEntityById(getCurrentUser().getId()));
     }
 
     @Override

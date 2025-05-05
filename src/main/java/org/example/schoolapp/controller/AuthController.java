@@ -19,6 +19,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.io.IOException;
+import java.util.Map;
 
 @RestController
 @RequestMapping("/api/v1/auth")
@@ -57,11 +58,25 @@ public class AuthController {
     @PostMapping("/login")
     public ResponseEntity<?> login(@RequestBody LoginRequest request) {
         try {
-            authService.login(request);
-            return ResponseEntity.ok("Please verify your 2 factor authentication email");
+            Map<String, String> authResponse = authService.login(request);
+            Map<String, Object> response;
+
+            if (authResponse.isEmpty()) {
+                response = Map.of(
+                        "message", "Please verify your 2 factor authentication email",
+                        "tokens", authResponse
+                );
+            } else {
+                response = Map.of(
+                        "message", "This is you tokens",
+                        "tokens", authResponse
+                );
+            }
+
+            return ResponseEntity.ok(response);
         } catch (Exception e) {
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
-                    .body("Login failed: " + e.getMessage());
+                    .body(Map.of("error", "Login failed: " + e.getMessage()));
         }
     }
 

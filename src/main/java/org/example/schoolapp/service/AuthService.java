@@ -24,7 +24,9 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
 import java.io.IOException;
+import java.util.HashMap;
 import java.util.HashSet;
+import java.util.Map;
 import java.util.Set;
 
 @Service
@@ -58,7 +60,7 @@ public class AuthService {
         emailService.sendVerificationEmail(user);
     }
 
-    public void login(LoginRequest request) {
+    public Map<String, String> login(LoginRequest request) throws IOException {
         var user = userService.getEntityByEmail(request.getEmail());
 
         if (!user.getIsEnabled()) {
@@ -72,7 +74,11 @@ public class AuthService {
                 )
         );
 
-        emailService.sendFactorAuthEmail(user);
+        if (user.getIs2FAEnabled()) {
+            emailService.sendFactorAuthEmail(user);
+            return new HashMap<>();
+        } else
+            return sendTokenResponse(user);
     }
 
     public void refreshToken(
@@ -105,5 +111,20 @@ public class AuthService {
                 new ObjectMapper().writeValue(response.getOutputStream(), authResponse);
             }
         }
+    }
+
+    public Map<String, String> sendTokenResponse(User user) {
+        String accessToken = jwtService.generateToken(user);
+        String refreshToken = jwtService.generateRefreshToken(user);
+
+        tokenService.saveUserToken(user, accessToken, TokenType.BEARER);
+        tokenService.saveUserToken(user, refreshToken, TokenType.REFRESH);
+
+        Map<String, String> tokens = Map.of(
+                "accessToken", accessToken,
+                "refreshToken", refreshToken
+        );
+
+        return tokens;
     }
 }

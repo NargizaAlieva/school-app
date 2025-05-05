@@ -21,6 +21,8 @@ import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.crypto.password.PasswordEncoder;
 
+import java.io.IOException;
+
 import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.Mockito.*;
 
@@ -59,7 +61,7 @@ class AuthServiceTest {
     }
 
     @Test
-    void login_shouldAuthenticateAndSend2FA() {
+    void login_shouldAuthenticateAndSend2FA() throws IOException {
         LoginRequest request = LoginRequest.builder()
                 .email("email@test.com")
                 .password("password")

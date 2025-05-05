@@ -71,6 +71,9 @@ public class User implements UserDetails {
     @Column(name = "is_enabled", nullable = false)
     private Boolean isEnabled;
 
+    @Column(name = "is_2factor_auth_enabled", nullable = false)
+    private Boolean is2FAEnabled;
+
     @Enumerated(EnumType.STRING)
     private AuthProvider provider;
 
@@ -98,6 +101,9 @@ public class User implements UserDetails {
 
         if (isEnabled == null)
             isEnabled = false;
+
+        if (is2FAEnabled == null)
+            is2FAEnabled = false;
 
         if(provider == null)
             provider = AuthProvider.LOCAL;

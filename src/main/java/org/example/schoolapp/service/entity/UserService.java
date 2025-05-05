@@ -8,8 +8,14 @@ import org.example.schoolapp.entity.User;
 import java.util.List;
 
 public interface UserService {
+    void enable2FA();
+    void disable2FA();
+
     User save(User user);
     User getEntityById(Long id);
+
+    UserDto getById();
+
     UserDto getById(Long id);
     UserDto getByUsername(String username);
 

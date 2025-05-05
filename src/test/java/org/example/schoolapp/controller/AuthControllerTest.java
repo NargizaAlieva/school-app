@@ -76,7 +76,7 @@ class AuthControllerTest {
     }
 
     @Test
-    void login_Success() {
+    void login_Success() throws IOException {
         ResponseEntity<?> response = authController.login(loginRequest);
 
         assertEquals(HttpStatus.OK, response.getStatusCode());
@@ -85,7 +85,7 @@ class AuthControllerTest {
     }
 
     @Test
-    void login_Failure() {
+    void login_Failure() throws IOException {
         String errorMessage = "Invalid credentials";
         doThrow(new RuntimeException(errorMessage)).when(authService).login(loginRequest);
 
