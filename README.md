@@ -1,4 +1,5 @@
-YouTube link https://youtu.be/y0L0eaMjMvM?si=zmAX7Mp0PEJsY2SE 
+**YouTube link finals:** https://youtu.be/Hxkp_Wfx_Z8?si=kyGHo0q0PuMmxtFc
+**YouTube link midterms:** https://youtu.be/y0L0eaMjMvM?si=zmAX7Mp0PEJsY2SE 
 
 # School Management System (SMS)
 
