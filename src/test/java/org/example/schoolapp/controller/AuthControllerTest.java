@@ -16,6 +16,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 
 import java.io.IOException;
+import java.util.Map;
 
 import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.Mockito.*;
@@ -76,12 +77,17 @@ class AuthControllerTest {
     }
 
     @Test
-    void login_Success() throws IOException {
-        ResponseEntity<?> response = authController.login(loginRequest);
+    void login_SuccessWithTokens() throws IOException {
+        Map<String, String> tokens = Map.of("accessToken", "token123", "refreshToken", "refresh123");
+        when(authService.login(any(LoginRequest.class))).thenReturn(tokens);
 
-        assertEquals(HttpStatus.OK, response.getStatusCode());
-        assertEquals("Please verify your 2 factor authentication email", response.getBody());
-        verify(authService).login(loginRequest);
+        ResponseEntity<?> result = authController.login(loginRequest);
+
+        assertEquals(HttpStatus.OK, result.getStatusCode());
+        assertTrue(result.getBody() instanceof Map);
+        Map<?, ?> responseBody = (Map<?, ?>) result.getBody();
+        assertEquals("This is you tokens", responseBody.get("message"));
+        assertEquals(tokens, responseBody.get("tokens"));
     }
 
     @Test

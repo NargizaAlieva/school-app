@@ -12,7 +12,6 @@ import org.example.schoolapp.repository.RoleRepository;
 import org.example.schoolapp.repository.UserRepository;
 import org.example.schoolapp.service.entity.TokenService;
 import org.example.schoolapp.service.entity.UserService;
-import org.example.schoolapp.util.mapper.UserMapper;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.oauth2.client.authentication.OAuth2AuthenticationToken;
@@ -30,7 +29,6 @@ public class OAuth2AuthenticationSuccessHandler implements AuthenticationSuccess
     private final TokenService tokenService;
     private final UserService userService;
     private final UserRepository userRepository;
-    private final UserMapper userMapper;
     private final RoleRepository roleRepository;
     private final PasswordEncoder passwordEncoder;
     private String randomPassword;

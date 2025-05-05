@@ -29,8 +29,12 @@ public class CustomOAuth2UserService extends DefaultOAuth2UserService {
         }
 
         if ("facebook".equals(registrationId)) {
-            // Facebook always returns an email if permission is granted
-            // If email is null, fallback logic could be added here too
+            String email = (String) attributes.get("email");
+            if (email == null) {
+                String id = (String) attributes.get("id");
+                attributes.put("email", id + "@facebook.local");
+                attributes.put("fallback_name", attributes.get("name"));
+            }
         }
 
         return new DefaultOAuth2User(

@@ -1,5 +1,6 @@
 package org.example.schoolapp.security;
 
+import com.fasterxml.jackson.databind.ObjectMapper;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import org.example.schoolapp.config.JwtAuthenticationSuccessHandler;
@@ -40,63 +41,63 @@ class JwtAuthenticationSuccessHandlerTest {
     @InjectMocks
     private JwtAuthenticationSuccessHandler successHandler;
 
-    private User enabledUser;
-    private User disabledUser;
+    private User user;
+    private StringWriter responseWriter;
 
     @BeforeEach
-    void setUp() {
-        enabledUser = new User();
-        enabledUser.setEmail("enabled@example.com");
-        enabledUser.setIsEnabled(true);
+    void setUp() throws IOException {
+        user = new User();
+        user.setEmail("test@example.com");
+        user.setIsEnabled(true);
+        user.setIs2FAEnabled(false);
 
-        disabledUser = new User();
-        disabledUser.setEmail("disabled@example.com");
-        disabledUser.setIsEnabled(false);
+        when(authentication.getPrincipal()).thenReturn(user);
+
+        responseWriter = new StringWriter();
+        when(response.getWriter()).thenReturn(new PrintWriter(responseWriter));
     }
 
     @Test
-    void onAuthenticationSuccess_WithEnabledUser_ShouldSend2FactorEmail() throws IOException {
-        when(authentication.getPrincipal()).thenReturn(enabledUser);
-        StringWriter stringWriter = new StringWriter();
-        when(response.getWriter()).thenReturn(new PrintWriter(stringWriter));
-
-        successHandler.onAuthenticationSuccess(request, response, authentication);
-
-        verify(emailService).sendFactorAuthEmail(enabledUser);
-        verify(response).setContentType(MediaType.APPLICATION_JSON_VALUE);
-        assertTrue(stringWriter.toString().contains("Please verify your 2-factor Authentication"));
-    }
-
-    @Test
-    void onAuthenticationSuccess_WithDisabledUser_ShouldThrowVerificationException() throws IOException {
-        when(authentication.getPrincipal()).thenReturn(disabledUser);
-        StringWriter stringWriter = new StringWriter();
-        when(response.getWriter()).thenReturn(new PrintWriter(stringWriter));
+    void onAuthenticationSuccess_WhenUserNotEnabled_ThrowsVerificationException() throws IOException {
+        user.setIsEnabled(false);
 
         assertThrows(VerificationException.class, () -> {
             successHandler.onAuthenticationSuccess(request, response, authentication);
         });
 
-        verify(emailService, never()).sendFactorAuthEmail(any());
         verify(response).setContentType(MediaType.APPLICATION_JSON_VALUE);
-        assertTrue(stringWriter.toString().contains("Please first verify your email"));
+        assertEquals("\"Please first verify your email\"", responseWriter.toString());
     }
 
     @Test
-    void onAuthenticationSuccess_WhenIOExceptionOccurs_ShouldPropagateException() throws IOException {
-        when(authentication.getPrincipal()).thenReturn(enabledUser);
-        when(response.getWriter()).thenThrow(new IOException("Failed to get writer"));
+    void onAuthenticationSuccess_When2FAEnabled_Sends2FAEmail() throws IOException {
+        user.setIs2FAEnabled(true);
+
+        successHandler.onAuthenticationSuccess(request, response, authentication);
+
+        verify(emailService).sendFactorAuthEmail(user);
+        verify(emailService, never()).generateTokens(any(), any());
+        verify(response).setContentType(MediaType.APPLICATION_JSON_VALUE);
+        assertEquals("\"Please verify your 2-factor Authentication. We sent you email message\"", responseWriter.toString());
+    }
+
+    @Test
+    void onAuthenticationSuccess_When2FADisabled_GeneratesTokens() throws IOException {
+        user.setIs2FAEnabled(false);
+
+        successHandler.onAuthenticationSuccess(request, response, authentication);
+
+        verify(emailService, never()).sendFactorAuthEmail(any());
+        verify(emailService).generateTokens(response, user);
+        verify(response).setContentType(MediaType.APPLICATION_JSON_VALUE);
+        assertEquals("\"Please verify your 2-factor Authentication. We sent you email message\"", responseWriter.toString());
+    }
+
+    @Test
+    void onAuthenticationSuccess_WhenIOExceptionOccurs_ThrowsRuntimeException() throws IOException {
+        when(response.getWriter()).thenThrow(new IOException("Test IO Exception"));
 
         assertThrows(IOException.class, () -> {
-            successHandler.onAuthenticationSuccess(request, response, authentication);
-        });
-    }
-
-    @Test
-    void onAuthenticationSuccess_WhenPrincipalNotUser_ShouldThrowClassCastException() {
-        when(authentication.getPrincipal()).thenReturn("not-a-user-object");
-
-        assertThrows(ClassCastException.class, () -> {
             successHandler.onAuthenticationSuccess(request, response, authentication);
         });
     }

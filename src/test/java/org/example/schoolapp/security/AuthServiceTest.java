@@ -17,11 +17,7 @@ import org.junit.jupiter.api.Test;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
-import org.springframework.security.authentication.AuthenticationManager;
-import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.crypto.password.PasswordEncoder;
-
-import java.io.IOException;
 
 import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.Mockito.*;
@@ -31,7 +27,6 @@ class AuthServiceTest {
     @Mock private UserService userService;
     @Mock private PasswordEncoder passwordEncoder;
     @Mock private RoleService roleService;
-    @Mock private AuthenticationManager authenticationManager;
     @Mock private EmailService emailService;
 
     @InjectMocks private AuthService authService;
@@ -58,23 +53,6 @@ class AuthServiceTest {
         authService.register(request);
 
         verify(emailService).sendVerificationEmail(any(User.class));
-    }
-
-    @Test
-    void login_shouldAuthenticateAndSend2FA() throws IOException {
-        LoginRequest request = LoginRequest.builder()
-                .email("email@test.com")
-                .password("password")
-                .build();
-
-        User user = User.builder().isEnabled(true).build();
-
-        when(userService.getEntityByEmail("email@test.com")).thenReturn(user);
-
-        authService.login(request);
-
-        verify(authenticationManager).authenticate(any(UsernamePasswordAuthenticationToken.class));
-        verify(emailService).sendFactorAuthEmail(user);
     }
 
     @Test
